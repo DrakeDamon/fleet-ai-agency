@@ -143,7 +143,7 @@ export default function LeadForm() {
               <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Fleet Size</label>
               <select
                 name="fleet_size"
-                className="w-full p-3 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                className="w-full p-3 border border-slate-300 rounded-lg bg-white text-slate-900 focus:ring-2 focus:ring-blue-600 focus:outline-none"
                 onChange={handleChange}
                 value={formData.fleet_size || ""}
               >
@@ -159,7 +159,7 @@ export default function LeadForm() {
               <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Your Role</label>
               <select
                 name="role"
-                className="w-full p-3 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                className="w-full p-3 border border-slate-300 rounded-lg bg-white text-slate-900 focus:ring-2 focus:ring-blue-600 focus:outline-none"
                 onChange={handleChange}
                 value={formData.role || ""}
               >
@@ -179,7 +179,7 @@ export default function LeadForm() {
                 type="email"
                 required
                 placeholder="name@company.com"
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                className="w-full p-3 border border-slate-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-blue-600 focus:outline-none"
                 onChange={handleChange}
                 value={formData.work_email || ""}
               />
@@ -206,7 +206,7 @@ export default function LeadForm() {
                 name="full_name"
                 required
                 placeholder="Full Name"
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                className="w-full p-3 border border-slate-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-blue-600 focus:outline-none"
                 onChange={handleChange}
                 value={formData.full_name || ""}
               />
@@ -214,7 +214,7 @@ export default function LeadForm() {
                 name="company_name"
                 required
                 placeholder="Company Name"
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                className="w-full p-3 border border-slate-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-blue-600 focus:outline-none"
                 onChange={handleChange}
                 value={formData.company_name || ""}
               />
@@ -224,7 +224,7 @@ export default function LeadForm() {
               <input
                 name="dot_number"
                 placeholder="DOT Number (Optional)"
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                className="w-full p-3 border border-slate-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-blue-600 focus:outline-none"
                 onChange={handleChange}
                 value={formData.dot_number || ""}
               />
@@ -247,7 +247,7 @@ export default function LeadForm() {
                 ))}
                 <input
                   placeholder="Other..."
-                  className="w-full p-2 text-sm border-b border-slate-200 focus:border-blue-500 focus:outline-none mt-2"
+                  className="w-full p-2 text-sm border-b border-slate-200 text-slate-900 focus:border-blue-500 focus:outline-none mt-2"
                   value={otherPainPoint}
                   onChange={(e) => setOtherPainPoint(e.target.value)}
                 />
