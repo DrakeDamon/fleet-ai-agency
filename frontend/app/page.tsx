@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import LeadForm from "@/components/LeadForm";
+import LeadForm from "../components/LeadForm";
 import { Check, TrendingUp, AlertTriangle, ShieldAlert } from "lucide-react";
 
 export const metadata: Metadata = {

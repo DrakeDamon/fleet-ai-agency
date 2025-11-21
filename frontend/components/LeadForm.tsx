@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { submitLead } from "@/lib/api";
-import { FleetSize, Role, LeadFormData } from "@/lib/types";
+import { submitLead } from "../lib/api";
+import { FleetSize, Role, LeadFormData } from "../lib/types";
 import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
 
 export default function LeadForm() {
