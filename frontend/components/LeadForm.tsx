@@ -145,7 +145,7 @@ export default function LeadForm() {
                 name="fleet_size"
                 className="w-full p-3 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none"
                 onChange={handleChange}
-                defaultValue=""
+                value={formData.fleet_size || ""}
               >
                 <option value="" disabled>Select Fleet Size</option>
                 <option value={FleetSize.SMALL}>10-20 Trucks</option>
@@ -161,7 +161,7 @@ export default function LeadForm() {
                 name="role"
                 className="w-full p-3 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none"
                 onChange={handleChange}
-                defaultValue=""
+                value={formData.role || ""}
               >
                 <option value="" disabled>Select Your Role</option>
                 <option value={Role.OWNER}>Owner / President</option>
@@ -181,7 +181,7 @@ export default function LeadForm() {
                 placeholder="name@company.com"
                 className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none"
                 onChange={handleChange}
-                defaultValue={formData.work_email}
+                value={formData.work_email || ""}
               />
             </div>
 
@@ -208,7 +208,7 @@ export default function LeadForm() {
                 placeholder="Full Name"
                 className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none"
                 onChange={handleChange}
-                defaultValue={formData.full_name}
+                value={formData.full_name || ""}
               />
               <input
                 name="company_name"
@@ -216,7 +216,7 @@ export default function LeadForm() {
                 placeholder="Company Name"
                 className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none"
                 onChange={handleChange}
-                defaultValue={formData.company_name}
+                value={formData.company_name || ""}
               />
             </div>
 
@@ -226,7 +226,7 @@ export default function LeadForm() {
                 placeholder="DOT Number (Optional)"
                 className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none"
                 onChange={handleChange}
-                defaultValue={formData.dot_number}
+                value={formData.dot_number || ""}
               />
               <p className="text-xs text-slate-400 mt-1 ml-1">Helps us pre-qualify your fleet size instantly.</p>
             </div>
@@ -258,7 +258,7 @@ export default function LeadForm() {
               <input
                 type="checkbox"
                 name="consent_audit"
-                defaultChecked={true}
+                checked={formData.consent_audit || false}
                 className="mt-1 h-4 w-4 text-blue-600 rounded border-gray-300"
                 onChange={(e) => setFormData(prev => ({...prev, consent_audit: e.target.checked}))}
               />
