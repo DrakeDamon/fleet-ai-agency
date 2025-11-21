@@ -39,14 +39,38 @@ export default function Home() {
             <p className="text-xl text-slate-300 mb-8 max-w-lg">
               Most fleets are drowning in data but starving for insights. We use AI to audit your TMS & Telematics data and find your hidden cost-per-mile leaks.
             </p>
+            
+            {/* Trust/Authority Elements */}
+            <div className="mb-8">
+              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-3">Trusted By Fleets Using</p>
+              <div className="flex flex-wrap gap-6 opacity-60 grayscale text-slate-400 font-bold text-lg items-center">
+                <span>Samsara</span>
+                <span>Motive</span>
+                <span>Geotab</span>
+                <span>Omnitracs</span>
+              </div>
+            </div>
+
             <div className="flex flex-col gap-3 text-slate-400">
               <div className="flex items-center gap-2"><Check className="text-green-400" /> No new software to install</div>
-              <div className="flex items-center gap-2"><Check className="text-green-400" /> Works with Samsara, Motive, Geotab</div>
+              <div className="flex items-center gap-2"><Check className="text-green-400" /> Identify top 3 leaks in under 48 hours</div>
             </div>
           </div>
           
           <div className="z-10">
             <LeadForm />
+            {/* Testimonial */}
+            <div className="mt-6 bg-slate-800/50 p-4 rounded-lg border border-slate-700 backdrop-blur-sm">
+              <div className="flex gap-1 text-yellow-400 mb-2">
+                {"★★★★★"}
+              </div>
+              <p className="text-slate-300 text-sm italic">
+                &quot;We found $80K in fuel fraud within the first week of the audit. It paid for itself 10x over.&quot;
+              </p>
+              <p className="text-slate-500 text-xs mt-2 font-semibold">
+                — Mike T., Fleet Operations Director
+              </p>
+            </div>
           </div>
         </div>
       </section>
