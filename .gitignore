@@ -43,3 +43,7 @@ hunter_cache.json
 
 # Scraper (gitignored for now)
 scraper/
+
+# Documentation
+*.md
+!README.md
