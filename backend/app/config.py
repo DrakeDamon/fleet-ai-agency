@@ -2,9 +2,10 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     DATABASE_URL: str
-    ADMIN_SECRET: str = "changeme"
-    HUNTER_API_KEY: str | None = None
-    
+    ADMIN_SECRET: str
+    HUNTER_API_KEY: str
+    FMCSA_WEBKEY: str | None = None
+
     class Config:
         env_file = ".env"
 

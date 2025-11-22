@@ -1,295 +1,210 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
-import { submitLead } from "../lib/api";
+import { useState } from "react";
+import { checkDotRisk, submitLead } from "../lib/api";
 import { FleetSize, Role, LeadFormData } from "../lib/types";
-import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { Loader2, AlertTriangle, CheckCircle, ArrowRight } from "lucide-react";
 
 export default function LeadForm() {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  // STATE MACHINE: 'input' -> 'analyzing' -> 'results' -> 'submitting' -> 'success'
+  const [step, setStep] = useState<'input' | 'analyzing' | 'results' | 'submitting' | 'success'>('input');
   
-  const [step, setStep] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Default State
+  // SINGLE SOURCE OF TRUTH
   const [formData, setFormData] = useState<Partial<LeadFormData>>({
-    fleet_size: undefined, // Force selection
-    role: undefined,       // Force selection
+    dot_number: "",
+    full_name: "",
+    work_email: "",
+    company_name: "",
+    fleet_size: "", // Empty string triggers placeholder
+    role: "",       // Empty string triggers placeholder
     consent_audit: true,
-    source: "landing_page",
-    pain_points: "",
   });
 
-  // Pain Points State for Multi-select
-  const [selectedPainPoints, setSelectedPainPoints] = useState<string[]>([]);
-  const [otherPainPoint, setOtherPainPoint] = useState("");
+  const [riskData, setRiskData] = useState<any>(null);
 
-  const PAIN_POINT_OPTIONS = [
-    "Fuel Fraud / Theft",
-    "Unexpected Downtime",
-    "Driver Retention",
-    "High Insurance Costs",
-    "Compliance / DOT Audits"
-  ];
-
-  // Capture UTMs on mount
-  useEffect(() => {
-    const utmSource = searchParams.get("utm_source");
-    const utmCampaign = searchParams.get("utm_campaign");
-    
-    setFormData((prev) => ({
-      ...prev,
-      landing_page_path: pathname,
-      utm_campaign: utmCampaign || undefined,
-      source: utmSource || "landing_page",
-    }));
-  }, [pathname, searchParams]);
-
-  // Update formData when pain points change
-  useEffect(() => {
-    const allPoints = [...selectedPainPoints];
-    if (otherPainPoint.trim()) {
-      allPoints.push(`Other: ${otherPainPoint}`);
-    }
-    setFormData(prev => ({ ...prev, pain_points: allPoints.join(", ") }));
-  }, [selectedPainPoints, otherPainPoint]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-
-    const result = await submitLead(formData as LeadFormData);
-
-    if (result.success) {
-      setIsSuccess(true);
-    } else {
-      setError(result.error || "Submission failed");
-    }
-    setIsLoading(false);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  // HANDLERS
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handlePainPointToggle = (point: string) => {
-    setSelectedPainPoints(prev => 
-      prev.includes(point) 
-        ? prev.filter(p => p !== point)
-        : [...prev, point]
-    );
-  };
-
-  const handleNextStep = () => {
-    if (step === 1) {
-      if (!formData.fleet_size || !formData.role || !formData.work_email) {
-        setError("Please fill out all fields to continue.");
-        return;
-      }
-      setError(null);
-      setStep(2);
+  const runInstantAudit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.dot_number) return;
+    
+    setStep('analyzing');
+    // Simulate "Calculating" delay for effect (psychology)
+    await new Promise(r => setTimeout(r, 1500));
+    
+    const data = await checkDotRisk(formData.dot_number);
+    if (data) {
+      setRiskData(data);
+      setFormData(prev => ({ ...prev, company_name: data.company_name })); // Auto-fill Name
+      setStep('results');
+    } else {
+      // Fallback if DOT not found
+      setStep('input'); 
+      alert("DOT Number not found. Please check and try again.");
     }
   };
 
-  if (isSuccess) {
+  const submitFinalLead = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStep('submitting');
+    // Combine the Risk Data into the "Pain Points" field for your reference
+    const finalPayload = {
+        ...formData,
+        pain_points: `Auto-Audit Risk: ${riskData?.risk_level} | Flags: ${riskData?.risk_flags?.join(", ")}`
+    };
+    
+    await submitLead(finalPayload as LeadFormData);
+    setStep('success');
+  };
+
+  // --- RENDER: STEP 1 (THE HOOK) ---
+  if (step === 'input' || step === 'analyzing') {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-lg p-8 text-center">
-        <div className="flex justify-center mb-4">
-          <CheckCircle className="h-12 w-12 text-green-600" />
+      <div className="bg-white p-8 rounded-xl shadow-2xl border border-slate-200">
+        <div className="mb-6 text-center">
+            <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wide">
+                Free Tool
+            </span>
+            <h3 className="text-2xl font-bold text-slate-900 mt-3">
+                Check Your DOT Risk Score
+            </h3>
+            <p className="text-slate-500 text-sm mt-2">
+                Enter your DOT# to see if you are flagged for an audit.
+            </p>
         </div>
-        <h3 className="text-xl font-bold text-green-800 mb-2">Request Received</h3>
-        <p className="text-green-700">
-          Your fleet data audit request has been queued. We will email you shortly to confirm your DOT verification.
-        </p>
+
+        <form onSubmit={runInstantAudit} className="space-y-4">
+          <div>
+            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider ml-1">US DOT Number</label>
+            <input
+                name="dot_number"
+                placeholder="e.g. 1234567"
+                value={formData.dot_number || ''} // SINGLE SOURCE OF TRUTH
+                onChange={handleChange}
+                className="w-full p-4 text-lg border-2 border-slate-200 rounded-lg text-slate-900 focus:border-blue-600 focus:outline-none font-mono"
+                required
+            />
+          </div>
+
+          <button 
+            disabled={step === 'analyzing'}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg transition-all flex justify-center items-center gap-2 text-lg"
+          >
+            {step === 'analyzing' ? (
+                <><Loader2 className="animate-spin" /> Analyzing FMCSA Database...</>
+            ) : (
+                "Check My Risk Score"
+            )}
+          </button>
+        </form>
       </div>
     );
   }
 
-  return (
-    <div className="bg-white p-6 rounded-xl shadow-2xl border border-slate-100 relative overflow-hidden">
-      {/* Progress Bar */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-slate-100">
-        <div 
-          className="h-full bg-blue-600 transition-all duration-500"
-          style={{ width: step === 1 ? "50%" : "100%" }}
-        />
-      </div>
-
-      <div className="mb-6 mt-2">
-        <h3 className="text-2xl font-bold text-slate-900">
-          {step === 1 ? "Get Your Fleet Audit" : "Finalize Your Request"}
-        </h3>
-        <p className="text-slate-500 text-sm">
-          {step === 1 ? "See exactly where you're losing margin." : "Identify your top 3 hidden cost-per-mile leaks."}
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm flex items-center gap-2 animate-pulse">
-            <AlertCircle className="h-4 w-4" /> {error}
-          </div>
-        )}
-
-        {step === 1 && (
-          <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Fleet Size</label>
-              <select
-                name="fleet_size"
-                className="w-full p-3 border border-slate-300 rounded-lg bg-white text-slate-900 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-                onChange={handleChange}
-                value={formData.fleet_size || ""}
-              >
-                <option value="" disabled>Select Fleet Size</option>
-                <option value={FleetSize.SMALL}>10-20 Trucks</option>
-                <option value={FleetSize.MEDIUM}>21-50 Trucks</option>
-                <option value={FleetSize.LARGE}>51-100 Trucks</option>
-                <option value={FleetSize.ENTERPRISE}>100+ Trucks</option>
-              </select>
+  // --- RENDER: STEP 2 (THE TEASER & GATE) ---
+  if (step === 'results') {
+    return (
+      <div className="bg-white p-8 rounded-xl shadow-2xl border-2 border-red-100">
+        {/* TEASER RESULTS */}
+        <div className="text-center mb-6">
+            <div className="inline-flex items-center gap-2 text-red-600 font-bold text-xl mb-2">
+                <AlertTriangle className="h-6 w-6" />
+                {riskData.risk_level} RISK DETECTED
             </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Your Role</label>
-              <select
-                name="role"
-                className="w-full p-3 border border-slate-300 rounded-lg bg-white text-slate-900 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-                onChange={handleChange}
-                value={formData.role || ""}
-              >
-                <option value="" disabled>Select Your Role</option>
-                <option value={Role.OWNER}>Owner / President</option>
-                <option value={Role.MANAGER}>Fleet Manager</option>
-                <option value={Role.OPS}>Operations</option>
-                <option value={Role.FINANCE}>Finance</option>
-                <option value={Role.OTHER}>Other</option>
-              </select>
+            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-left space-y-2">
+                <p className="text-sm text-slate-600">
+                    <strong>Fleet:</strong> {riskData.company_name}
+                </p>
+                <p className="text-sm text-slate-600">
+                    <strong>Vehicle OOS:</strong> <span className="text-red-600 font-bold">{riskData.vehicle_oos_rate}%</span> 
+                    <span className="text-slate-400 text-xs ml-1">(Natl Avg: 22%)</span>
+                </p>
+                <p className="text-xs text-slate-500 mt-2 italic">
+                    We found {riskData.risk_flags.length} critical data errors triggering this score.
+                </p>
             </div>
+        </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Work Email</label>
-              <input
+        {/* THE GATE FORM */}
+        <form onSubmit={submitFinalLead} className="space-y-3">
+            <h4 className="text-md font-bold text-slate-800 text-center">
+                Where should we send the Fix Report?
+            </h4>
+            
+            <input
+                name="full_name"
+                placeholder="Your Name"
+                required
+                value={formData.full_name || ''}
+                onChange={handleChange}
+                className="w-full p-3 border border-slate-300 rounded-lg text-slate-900"
+            />
+            <input
                 name="work_email"
                 type="email"
+                placeholder="Work Email (Required for Report)"
                 required
-                placeholder="name@company.com"
-                className="w-full p-3 border border-slate-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                value={formData.work_email || ''}
                 onChange={handleChange}
-                value={formData.work_email || ""}
-              />
-            </div>
-
-            <button
-              type="button"
-              onClick={handleNextStep}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg transition-all flex justify-center items-center gap-2 shadow-lg shadow-blue-600/20"
-            >
-              Next Step <Loader2 className="h-4 w-4 opacity-0" /> {/* Spacer */}
-            </button>
+                className="w-full p-3 border border-slate-300 rounded-lg text-slate-900"
+            />
             
-            <p className="text-center text-xs text-slate-400">
-              Step 1 of 2 • No credit card required
-            </p>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-            <div className="grid grid-cols-1 gap-4">
-              <input
-                name="full_name"
-                required
-                placeholder="Full Name"
-                className="w-full p-3 border border-slate-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-                onChange={handleChange}
-                value={formData.full_name || ""}
-              />
-              <input
-                name="company_name"
-                required
-                placeholder="Company Name"
-                className="w-full p-3 border border-slate-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-                onChange={handleChange}
-                value={formData.company_name || ""}
-              />
+            <div className="grid grid-cols-2 gap-2">
+                <select 
+                    name="fleet_size" 
+                    value={formData.fleet_size || ''} 
+                    onChange={handleChange}
+                    className="w-full p-3 border border-slate-300 rounded-lg bg-white text-slate-900"
+                    required
+                >
+                    <option value="" disabled>Fleet Size</option>
+                    <option value={FleetSize.SMALL}>10-20 Trucks</option>
+                    <option value={FleetSize.MEDIUM}>21-50 Trucks</option>
+                    <option value={FleetSize.LARGE}>51-100 Trucks</option>
+                    <option value={FleetSize.ENTERPRISE}>100+ Trucks</option>
+                </select>
+                
+                 <select 
+                    name="role" 
+                    value={formData.role || ''} 
+                    onChange={handleChange}
+                    className="w-full p-3 border border-slate-300 rounded-lg bg-white text-slate-900"
+                    required
+                >
+                    <option value="" disabled>Role</option>
+                    <option value={Role.OWNER}>Owner</option>
+                    <option value={Role.MANAGER}>Manager</option>
+                    <option value={Role.FINANCE}>Finance</option>
+                    <option value={Role.OTHER}>Other</option>
+                </select>
             </div>
 
-            <div>
-              <input
-                name="dot_number"
-                placeholder="DOT Number (Optional)"
-                className="w-full p-3 border border-slate-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-blue-600 focus:outline-none"
-                onChange={handleChange}
-                value={formData.dot_number || ""}
-              />
-              <p className="text-xs text-slate-400 mt-1 ml-1">Helps us pre-qualify your fleet size instantly.</p>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">Biggest Headaches (Select all that apply)</label>
-              <div className="space-y-2">
-                {PAIN_POINT_OPTIONS.map((point) => (
-                  <label key={point} className="flex items-center gap-3 p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                      checked={selectedPainPoints.includes(point)}
-                      onChange={() => handlePainPointToggle(point)}
-                    />
-                    <span className="text-sm text-slate-700">{point}</span>
-                  </label>
-                ))}
-                <input
-                  placeholder="Other..."
-                  className="w-full p-2 text-sm border-b border-slate-200 text-slate-900 focus:border-blue-500 focus:outline-none mt-2"
-                  value={otherPainPoint}
-                  onChange={(e) => setOtherPainPoint(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="flex items-start gap-2 bg-slate-50 p-3 rounded-lg">
-              <input
-                type="checkbox"
-                name="consent_audit"
-                checked={formData.consent_audit || false}
-                className="mt-1 h-4 w-4 text-blue-600 rounded border-gray-300"
-                onChange={(e) => setFormData(prev => ({...prev, consent_audit: e.target.checked}))}
-              />
-              <label className="text-xs text-slate-500 leading-relaxed">
-                I agree to receive the audit report and related insights via email. We respect your inbox.
-              </label>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-4 rounded-lg transition-all flex justify-center items-center gap-2 shadow-xl shadow-blue-900/20"
+            <button 
+                disabled={step === 'submitting'}
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg shadow-lg hover:shadow-xl transition-all flex justify-center items-center gap-2 mt-4"
             >
-              {isLoading ? <Loader2 className="animate-spin" /> : "Get My Free Profit Leak Report"}
+                {step === 'submitting' ? <Loader2 className="animate-spin"/> : <>Unlock My Full Report <ArrowRight/></>}
             </button>
-            
-            <div className="flex justify-between items-center">
-              <button 
-                type="button" 
-                onClick={() => setStep(1)}
-                className="text-xs text-slate-400 hover:text-slate-600"
-              >
-                ← Back
-              </button>
-              <p className="text-xs text-red-500 font-medium animate-pulse">
-                Only 5 slots left for this month
-              </p>
-            </div>
-          </div>
-        )}
-      </form>
+        </form>
+      </div>
+    );
+  }
+
+  // --- RENDER: STEP 3 (SUCCESS) ---
+  return (
+    <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
+        <div className="flex justify-center mb-4">
+            <CheckCircle className="h-16 w-16 text-green-600" />
+        </div>
+        <h3 className="text-2xl font-bold text-green-800 mb-2">Report Generating...</h3>
+        <p className="text-green-700">
+            We are pulling your full FMCSA inspection history now. 
+            Check your email in 5-10 minutes for your <strong>Data Risk Snapshot</strong>.
+        </p>
     </div>
   );
 }

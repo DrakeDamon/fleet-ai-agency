@@ -27,8 +27,19 @@ export async function submitLead(data: LeadFormData): Promise<{ success: boolean
 
     // Generic fallback
     return { success: false, error: "Something went wrong. Please try again later." };
-  } catch (err) {
-    console.error("API Error:", err);
-    return { success: false, error: "Network error. Please check your connection." };
+  } catch (error) {
+    console.error("API Error:", error);
+    return { success: false, error: "Network error" };
+  }
+}
+
+export async function checkDotRisk(dotNumber: string) {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/leads/audit/preview/${dotNumber}`);
+    if (!res.ok) throw new Error("DOT Not Found");
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+    return null;
   }
 }
