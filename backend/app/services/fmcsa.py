@@ -24,11 +24,21 @@ async def fetch_carrier_risk(dot_number: str):
                 raise HTTPException(status_code=404, detail="DOT Number not found")
 
             data = response.json()
-            content = data.get("content", [])
+            content = data.get("content")
+            
             if not content:
                  raise HTTPException(status_code=404, detail="DOT Number not found")
             
-            carrier = content[0].get("carrier", {})
+            # Handle both list (some endpoints) and dict (this endpoint)
+            if isinstance(content, list):
+                if not content:
+                    raise HTTPException(status_code=404, detail="DOT Number not found")
+                carrier = content[0].get("carrier", {})
+            else:
+                carrier = content.get("carrier", {})
+            
+            if not carrier:
+                 raise HTTPException(status_code=404, detail="DOT Number not found")
             if not carrier:
                  raise HTTPException(status_code=404, detail="DOT Number not found")
             
