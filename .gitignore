@@ -1,0 +1,32 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+.env
+.env.local
+.DS_Store
+
+# Node
+node_modules/
+.next/
+out/
+build/
+dist/
+npm-debug.log
+yarn-error.log
+
+# Scraper Data
+scraper/*.csv
+scraper/*.json
+scraper/*.md
+!scraper/README.md
+
+# Editor
+.vscode/
+.idea/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
