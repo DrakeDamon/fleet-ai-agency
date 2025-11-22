@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { checkDotRisk, submitLead } from "../lib/api";
 import { FleetSize, Role, LeadFormData } from "../lib/types";
-import { Loader2, AlertTriangle, CheckCircle, ArrowRight } from "lucide-react";
+import { Loader2, AlertTriangle, CheckCircle, ArrowRight, ChevronLeft } from "lucide-react";
 
 export default function LeadForm() {
-  // STATE MACHINE: 'input' -> 'analyzing' -> 'results' -> 'submitting' -> 'success'
-  const [step, setStep] = useState<'input' | 'analyzing' | 'results' | 'submitting' | 'success'>('input');
+  // STATE MACHINE: 'input' -> 'analyzing' -> 'results' -> 'qualification' -> 'submitting' -> 'success'
+  const [step, setStep] = useState<'input' | 'analyzing' | 'results' | 'qualification' | 'submitting' | 'success'>('input');
   
   // SINGLE SOURCE OF TRUTH
   const [formData, setFormData] = useState<Partial<LeadFormData>>({
@@ -15,15 +15,18 @@ export default function LeadForm() {
     full_name: "",
     work_email: "",
     company_name: "",
-    fleet_size: undefined, // Empty string triggers placeholder
-    role: undefined,       // Empty string triggers placeholder
+    fleet_size: undefined,
+    role: undefined,
     consent_audit: true,
+    phone: "",
+    pain_points: "",
+    tech_stack: "",
   });
 
   const [riskData, setRiskData] = useState<any>(null);
 
   // HANDLERS
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -48,13 +51,23 @@ export default function LeadForm() {
     }
   };
 
+  const handleStage2Submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Basic validation
+    if (!formData.full_name || !formData.work_email || !formData.fleet_size || !formData.role) {
+        alert("Please fill in all fields to proceed.");
+        return;
+    }
+    setStep('qualification');
+  };
+
   const submitFinalLead = async (e: React.FormEvent) => {
     e.preventDefault();
     setStep('submitting');
     // Combine the Risk Data into the "Pain Points" field for your reference
     const finalPayload = {
         ...formData,
-        pain_points: `Auto-Audit Risk: ${riskData?.risk_level} | Flags: ${riskData?.risk_flags?.join(", ")}`
+        pain_points: `User Input: ${formData.pain_points} | Auto-Audit Risk: ${riskData?.risk_level} | Flags: ${riskData?.risk_flags?.join(", ")}`
     };
     
     await submitLead(finalPayload as LeadFormData);
@@ -106,7 +119,7 @@ export default function LeadForm() {
   }
 
   // --- RENDER: STEP 2 (THE TEASER & GATE) ---
-  if (step === 'results' || step === 'submitting') {
+  if (step === 'results') {
     return (
       <div className="bg-white p-8 rounded-xl shadow-2xl border-2 border-red-100">
         {/* TEASER RESULTS */}
@@ -130,7 +143,7 @@ export default function LeadForm() {
         </div>
 
         {/* THE GATE FORM */}
-        <form onSubmit={submitFinalLead} className="space-y-3">
+        <form onSubmit={handleStage2Submit} className="space-y-3">
             <h4 className="text-md font-bold text-slate-800 text-center">
                 Where should we send the Fix Report?
             </h4>
@@ -184,17 +197,87 @@ export default function LeadForm() {
             </div>
 
             <button 
-                disabled={step === 'submitting'}
+                type="submit"
                 className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg shadow-lg hover:shadow-xl transition-all flex justify-center items-center gap-2 mt-4"
             >
-                {step === 'submitting' ? <Loader2 className="animate-spin"/> : <>Unlock My Full Report <ArrowRight/></>}
+                Unlock My Full Report <ArrowRight/>
             </button>
         </form>
       </div>
     );
   }
 
-  // --- RENDER: STEP 3 (SUCCESS) ---
+  // --- RENDER: STEP 3 (QUALIFICATION) ---
+  if (step === 'qualification' || step === 'submitting') {
+    return (
+      <div className="bg-white p-8 rounded-xl shadow-2xl border border-slate-200">
+        <div className="mb-6 text-center">
+            <h3 className="text-2xl font-bold text-slate-900">
+                Final Step: Customize Your Audit
+            </h3>
+            <p className="text-slate-500 text-sm mt-2">
+                To ensure your report is accurate, tell us a bit about your operations.
+            </p>
+        </div>
+
+        <form onSubmit={submitFinalLead} className="space-y-4">
+            <div>
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider ml-1">Mobile Number (For SMS Alerts)</label>
+                <input
+                    name="phone"
+                    type="tel"
+                    placeholder="(555) 555-5555"
+                    value={formData.phone || ''}
+                    onChange={handleChange}
+                    className="w-full p-3 border border-slate-300 rounded-lg text-slate-900"
+                />
+            </div>
+
+            <div>
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider ml-1">What is your primary financial headache right now?</label>
+                <textarea
+                    name="pain_points"
+                    placeholder="e.g. Fuel theft, Unplanned downtime, Broker fraud..."
+                    value={formData.pain_points || ''}
+                    onChange={handleChange}
+                    className="w-full p-3 border border-slate-300 rounded-lg text-slate-900 h-24"
+                    required
+                />
+            </div>
+
+            <div>
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider ml-1">What ELD or TMS do you use?</label>
+                <textarea
+                    name="tech_stack"
+                    placeholder="e.g. Samsara, Motive, McLeod..."
+                    value={formData.tech_stack || ''}
+                    onChange={handleChange}
+                    className="w-full p-3 border border-slate-300 rounded-lg text-slate-900 h-20"
+                />
+            </div>
+
+            <button 
+                disabled={step === 'submitting'}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg shadow-lg hover:shadow-xl transition-all flex justify-center items-center gap-2 mt-2"
+            >
+                {step === 'submitting' ? <Loader2 className="animate-spin"/> : "Generate My Risk Report"}
+            </button>
+            
+            <div className="text-center mt-4">
+                <button 
+                    type="button" 
+                    onClick={() => setStep('results')}
+                    className="text-slate-400 text-sm hover:text-slate-600 flex items-center justify-center gap-1 mx-auto"
+                >
+                    <ChevronLeft className="h-4 w-4" /> Back
+                </button>
+            </div>
+        </form>
+      </div>
+    );
+  }
+
+  // --- RENDER: STEP 4 (SUCCESS) ---
   return (
     <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
         <div className="flex justify-center mb-4">
