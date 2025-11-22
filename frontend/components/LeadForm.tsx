@@ -15,8 +15,8 @@ export default function LeadForm() {
     full_name: "",
     work_email: "",
     company_name: "",
-    fleet_size: "", // Empty string triggers placeholder
-    role: "",       // Empty string triggers placeholder
+    fleet_size: undefined, // Empty string triggers placeholder
+    role: undefined,       // Empty string triggers placeholder
     consent_audit: true,
   });
 
@@ -106,7 +106,7 @@ export default function LeadForm() {
   }
 
   // --- RENDER: STEP 2 (THE TEASER & GATE) ---
-  if (step === 'results') {
+  if (step === 'results' || step === 'submitting') {
     return (
       <div className="bg-white p-8 rounded-xl shadow-2xl border-2 border-red-100">
         {/* TEASER RESULTS */}
