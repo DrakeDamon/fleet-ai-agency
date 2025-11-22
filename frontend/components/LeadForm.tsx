@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { checkDotRisk, submitLead } from "../lib/api";
 import { FleetSize, Role, LeadFormData } from "../lib/types";
-import { Loader2, AlertTriangle, CheckCircle, ArrowRight, ShieldCheck } from "lucide-react";
+import { Loader2, AlertTriangle, CheckCircle, ArrowRight } from "lucide-react";
 
 export default function LeadForm() {
-  // STATE MACHINE: 'input' -> 'analyzing' -> 'results' -> 'qualification' -> 'submitting' -> 'success'
-  const [step, setStep] = useState<'input' | 'analyzing' | 'results' | 'qualification' | 'submitting' | 'success'>('input');
+  // STATE MACHINE: 'input' -> 'analyzing' -> 'results' -> 'submitting' -> 'success'
+  const [step, setStep] = useState<'input' | 'analyzing' | 'results' | 'submitting' | 'success'>('input');
   
   // SINGLE SOURCE OF TRUTH
   const [formData, setFormData] = useState<Partial<LeadFormData>>({
@@ -15,18 +15,15 @@ export default function LeadForm() {
     full_name: "",
     work_email: "",
     company_name: "",
-    phone: "",
-    fleet_size: undefined, 
-    role: undefined,       
-    pain_points: "",
-    tech_stack: "",
+    fleet_size: "", // Empty string triggers placeholder
+    role: "",       // Empty string triggers placeholder
     consent_audit: true,
   });
 
   const [riskData, setRiskData] = useState<any>(null);
 
   // HANDLERS
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -51,25 +48,13 @@ export default function LeadForm() {
     }
   };
 
-  // Step 2 Handler: The Gate (Email Capture)
-  const handleEmailGate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // In a real app, you might fire a "Partial Lead" event here
-    setStep('qualification');
-  };
-
-  // Step 3 Handler: Final Submission
-  const submitFullQualification = async (e: React.FormEvent) => {
+  const submitFinalLead = async (e: React.FormEvent) => {
     e.preventDefault();
     setStep('submitting');
-    
-    // Combine the Risk Data into the "Pain Points" field for context, preserving user input
-    const riskContext = `[RISK REPORT] Level: ${riskData?.risk_level} | OOS: ${riskData?.vehicle_oos_rate}% | Flags: ${riskData?.risk_flags?.join(", ")}`;
-    const finalPainPoints = formData.pain_points ? `${formData.pain_points} \n\n${riskContext}` : riskContext;
-
+    // Combine the Risk Data into the "Pain Points" field for your reference
     const finalPayload = {
         ...formData,
-        pain_points: finalPainPoints
+        pain_points: `Auto-Audit Risk: ${riskData?.risk_level} | Flags: ${riskData?.risk_flags?.join(", ")}`
     };
     
     await submitLead(finalPayload as LeadFormData);
@@ -145,7 +130,7 @@ export default function LeadForm() {
         </div>
 
         {/* THE GATE FORM */}
-        <form onSubmit={handleEmailGate} className="space-y-3">
+        <form onSubmit={submitFinalLead} className="space-y-3">
             <h4 className="text-md font-bold text-slate-800 text-center">
                 Where should we send the Fix Report?
             </h4>
@@ -168,31 +153,6 @@ export default function LeadForm() {
                 className="w-full p-3 border border-slate-300 rounded-lg text-slate-900"
             />
             
-            <button 
-                className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-lg shadow-lg hover:shadow-xl transition-all flex justify-center items-center gap-2 mt-4"
-            >
-                Next: Customize Report <ArrowRight/>
-            </button>
-        </form>
-      </div>
-    );
-  }
-
-  // --- RENDER: STEP 3 (QUALIFICATION) ---
-  if (step === 'qualification' || step === 'submitting') {
-    return (
-      <div className="bg-white p-8 rounded-xl shadow-2xl border-2 border-blue-100">
-        <div className="mb-6 text-center">
-            <div className="inline-flex items-center gap-2 text-blue-600 font-bold text-lg mb-2">
-                <ShieldCheck className="h-6 w-6" />
-                Almost Done!
-            </div>
-            <p className="text-slate-500 text-sm">
-                Help us tailor the <strong>Data Risk Snapshot</strong> to your fleet.
-            </p>
-        </div>
-
-        <form onSubmit={submitFullQualification} className="space-y-4">
             <div className="grid grid-cols-2 gap-2">
                 <select 
                     name="fleet_size" 
@@ -223,55 +183,27 @@ export default function LeadForm() {
                 </select>
             </div>
 
-            <input
-                name="phone"
-                type="tel"
-                placeholder="Phone Number (Optional - for critical alerts)"
-                value={formData.phone || ''}
-                onChange={handleChange}
-                className="w-full p-3 border border-slate-300 rounded-lg text-slate-900"
-            />
-
-            <textarea
-                name="pain_points"
-                placeholder="What is your biggest safety/compliance headache right now?"
-                value={formData.pain_points || ''}
-                onChange={handleChange}
-                className="w-full p-3 border border-slate-300 rounded-lg text-slate-900 h-24"
-            />
-
-            <textarea
-                name="tech_stack"
-                placeholder="What ELD / TMS do you use? (e.g. Motive, Samsara)"
-                value={formData.tech_stack || ''}
-                onChange={handleChange}
-                className="w-full p-3 border border-slate-300 rounded-lg text-slate-900 h-20"
-            />
-
             <button 
                 disabled={step === 'submitting'}
                 className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg shadow-lg hover:shadow-xl transition-all flex justify-center items-center gap-2 mt-4"
             >
-                {step === 'submitting' ? <Loader2 className="animate-spin"/> : <>Unlock Full Report <ArrowRight/></>}
+                {step === 'submitting' ? <Loader2 className="animate-spin"/> : <>Unlock My Full Report <ArrowRight/></>}
             </button>
         </form>
       </div>
     );
   }
 
-  // --- RENDER: STEP 4 (SUCCESS) ---
+  // --- RENDER: STEP 3 (SUCCESS) ---
   return (
     <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
         <div className="flex justify-center mb-4">
             <CheckCircle className="h-16 w-16 text-green-600" />
         </div>
         <h3 className="text-2xl font-bold text-green-800 mb-2">Report Generating...</h3>
-        <p className="text-green-700 mb-4">
+        <p className="text-green-700">
             We are pulling your full FMCSA inspection history now. 
-            Check your email <strong>({formData.work_email})</strong> in 5-10 minutes.
-        </p>
-        <p className="text-sm text-green-600">
-            Our team will review your <strong>{formData.tech_stack || 'systems'}</strong> compatibility and send a custom integration guide.
+            Check your email in 5-10 minutes for your <strong>Data Risk Snapshot</strong>.
         </p>
     </div>
   );

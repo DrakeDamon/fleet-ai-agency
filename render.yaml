@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: fmcsa-backend
+    env: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: ADMIN_SECRET
+        sync: false
+      - key: HUNTER_API_KEY
+        sync: false
+      - key: FMCSA_WEBKEY
+        sync: false
+      # PORT is automatically set by Render - don't override
+
