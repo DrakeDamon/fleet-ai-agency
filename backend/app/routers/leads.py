@@ -88,9 +88,14 @@ async def handle_lead_automation(lead: Lead, session: Session):
             pdf_bytes = generate_risk_report(lead, fmcsa_data)
             print(f"   - PDF Generated ({len(pdf_bytes)} bytes)")
             
+            # Extract Name for Personalization
+            name_parts = lead.full_name.split(" ")
+            first_name = name_parts[0]
+            last_name = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
+            
             # Send Email (Sync)
             print(f"   - Sending Email to {lead.work_email}...")
-            email_result = send_report_email(lead.work_email, lead.first_name, pdf_bytes, lead.dot_number)
+            email_result = send_report_email(lead.work_email, first_name, pdf_bytes, lead.dot_number)
             if email_result:
                 print(f"   ✅ Email Sent! ID: {email_result.get('id')}")
             else:
@@ -98,7 +103,7 @@ async def handle_lead_automation(lead: Lead, session: Session):
             
             # Subscribe (Sync)
             print(f"   - Subscribing to Newsletter...")
-            sub_result = subscribe_to_newsletter(lead.work_email, lead.first_name, lead.last_name)
+            sub_result = subscribe_to_newsletter(lead.work_email, first_name, last_name)
             if sub_result:
                 print(f"   ✅ Subscribed! ID: {sub_result.get('id')}")
             else:
