@@ -13,6 +13,14 @@ export enum Role {
   OTHER = "Other"
 }
 
+export enum PainPoint {
+  BROKER_FRAUD = "Broker Fraud / Double Brokering",
+  INSURANCE = "Insurance Premium Spikes",
+  DOWNTIME = "Unplanned Breakdowns / Downtime",
+  FUEL_THEFT = "Fuel Theft / High Fuel Costs",
+  OTHER = "Other / Not Sure"
+}
+
 export interface LeadFormData {
   full_name: string;
   work_email: string;
@@ -21,7 +29,7 @@ export interface LeadFormData {
   dot_number?: string; // Optional, but we will encourage it in UX
   fleet_size: FleetSize;
   role: Role;
-  pain_points?: string;
+  pain_points?: PainPoint | string; // Allow string for backward compatibility or custom input if needed, but primarily PainPoint
   
   // Hidden / Auto-captured
   tech_stack?: string;

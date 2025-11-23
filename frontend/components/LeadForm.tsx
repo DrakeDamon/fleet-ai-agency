@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { checkDotRisk, submitLead } from "../lib/api";
-import { FleetSize, Role, LeadFormData } from "../lib/types";
+import { FleetSize, Role, LeadFormData, PainPoint } from "../lib/types";
 import { Loader2, AlertTriangle, CheckCircle, ArrowRight, ChevronLeft, X } from "lucide-react";
 import { InlineWidget } from "react-calendly";
 
@@ -20,7 +20,7 @@ export default function LeadForm() {
     role: undefined,
     consent_audit: true,
     phone: "",
-    pain_points: "",
+    pain_points: undefined,
     tech_stack: "",
   });
 
@@ -31,6 +31,36 @@ export default function LeadForm() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const getUrgencyCopy = (painPoint?: PainPoint | string) => {
+    switch (painPoint) {
+        case PainPoint.BROKER_FRAUD:
+            return {
+                headline: "⚠️ WAIT. Your Authority is at Risk.",
+                subtext: "...target for Double Brokering scams..."
+            };
+        case PainPoint.INSURANCE:
+            return {
+                headline: "⚠️ WAIT. Your Premium is about to jump.",
+                subtext: "...liability causing rate hikes..."
+            };
+        case PainPoint.DOWNTIME:
+            return {
+                headline: "⚠️ WAIT. Your Trucks are failing inspection.",
+                subtext: "...maintenance violations leading to shut-downs..."
+            };
+        case PainPoint.FUEL_THEFT:
+            return {
+                headline: "⚠️ WAIT. Your Fuel Costs are Bleeding Profit.",
+                subtext: "...unverified fuel card transactions..."
+            };
+        default:
+            return {
+                headline: "⚠️ WAIT. Your Risk Score is Higher Than Average.",
+                subtext: "...to fix these violations and prevent a potential insurance hike immediately."
+            };
+    }
   };
 
   const runInstantAudit = async (e: React.FormEvent) => {
@@ -236,15 +266,21 @@ export default function LeadForm() {
             </div>
 
             <div>
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider ml-1">What is your primary financial headache right now?</label>
-                <textarea
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider ml-1">What is your #1 Financial Headache?</label>
+                <select
                     name="pain_points"
-                    placeholder="e.g. Fuel theft, Unplanned downtime, Broker fraud..."
                     value={formData.pain_points || ''}
                     onChange={handleChange}
-                    className="w-full p-3 border border-slate-300 rounded-lg text-slate-900 h-24"
+                    className="w-full p-3 border border-slate-300 rounded-lg bg-white text-slate-900"
                     required
-                />
+                >
+                    <option value="" disabled>Select your primary challenge...</option>
+                    <option value={PainPoint.BROKER_FRAUD}>{PainPoint.BROKER_FRAUD}</option>
+                    <option value={PainPoint.INSURANCE}>{PainPoint.INSURANCE}</option>
+                    <option value={PainPoint.DOWNTIME}>{PainPoint.DOWNTIME}</option>
+                    <option value={PainPoint.FUEL_THEFT}>{PainPoint.FUEL_THEFT}</option>
+                    <option value={PainPoint.OTHER}>{PainPoint.OTHER}</option>
+                </select>
             </div>
 
             <div>
@@ -295,11 +331,11 @@ export default function LeadForm() {
                     <div className="text-center mb-6">
                         <div className="inline-flex items-center gap-2 text-orange-600 font-bold text-lg animate-pulse">
                             <AlertTriangle className="h-5 w-5" />
-                            WAIT. Your Risk Score is Higher Than Average.
+                            {getUrgencyCopy(formData.pain_points).headline}
                         </div>
                         <p className="text-slate-600 text-sm mt-2">
                             Your Data Risk Snapshot has been sent to <strong>{formData.work_email}</strong>. 
-                            However, due to your critical risk factors, we have unlocked a <span className="font-bold text-slate-900">Priority Review Call</span> to fix these violations and prevent a potential insurance hike immediately.
+                            However, due to your critical risk factors, we have unlocked a <span className="font-bold text-slate-900">Priority Review Call</span> {getUrgencyCopy(formData.pain_points).subtext}
                         </p>
                     </div>
 
