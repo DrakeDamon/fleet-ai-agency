@@ -27,7 +27,7 @@ async def create_lead(
     request: Request, 
     lead: LeadCreate, 
     session: Session = Depends(get_session),
-    background_tasks: BackgroundTasks = None
+    background_tasks: BackgroundTasks
 ):
     # 1. Create DB Object
     db_lead = Lead.from_orm(lead)
