@@ -74,21 +74,37 @@ async def handle_lead_automation(lead: Lead, session: Session):
     # 2. PDF & Email Fulfillment
     if lead.dot_number:
         try:
+            print(f"🚀 Starting Automation for Lead {lead.id} (DOT: {lead.dot_number})")
+            
             # Re-fetch fresh data for the PDF (Async)
+            print("   - Fetching FMCSA data...")
             fmcsa_data = await fetch_carrier_risk(lead.dot_number)
             
             # Generate PDF (Sync)
-            # We need to import these services inside the function or at top level
+            print("   - Generating PDF...")
             from app.services.pdf import generate_risk_report
             from app.services.email import send_report_email, subscribe_to_newsletter
             
             pdf_bytes = generate_risk_report(lead, fmcsa_data)
+            print(f"   - PDF Generated ({len(pdf_bytes)} bytes)")
             
             # Send Email (Sync)
-            send_report_email(lead.work_email, lead.first_name, pdf_bytes, lead.dot_number)
+            print(f"   - Sending Email to {lead.work_email}...")
+            email_result = send_report_email(lead.work_email, lead.first_name, pdf_bytes, lead.dot_number)
+            if email_result:
+                print(f"   ✅ Email Sent! ID: {email_result.get('id')}")
+            else:
+                print("   ❌ Email Failed to Send (Check Resend Logs)")
             
             # Subscribe (Sync)
-            subscribe_to_newsletter(lead.work_email, lead.first_name, lead.last_name)
+            print(f"   - Subscribing to Newsletter...")
+            sub_result = subscribe_to_newsletter(lead.work_email, lead.first_name, lead.last_name)
+            if sub_result:
+                print(f"   ✅ Subscribed! ID: {sub_result.get('id')}")
+            else:
+                print("   ⚠️ Subscription Failed (Check Resend Logs)")
             
         except Exception as e:
             print(f"❌ Automation Error for Lead {lead.id}: {e}")
+            import traceback
+            traceback.print_exc()
