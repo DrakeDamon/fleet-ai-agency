@@ -71,3 +71,102 @@ def subscribe_to_newsletter(email: str, first_name: str, last_name: str = ""):
     except Exception as e:
         print(f"Failed to subscribe contact: {e}")
         return None
+
+# ---------------------------------------------------------------------------
+# EMAIL VERIFICATION (Hunter.io) - LEGACY FUNCTION
+# ---------------------------------------------------------------------------
+
+import httpx
+import json
+import time
+from sqlmodel import Session
+from app.models import Lead
+from app.config import settings
+
+# Hunter.io Cache File
+HUNTER_CACHE_FILE = "hunter_cache.json"
+
+def load_hunter_cache():
+    if os.path.exists(HUNTER_CACHE_FILE):
+        try:
+            with open(HUNTER_CACHE_FILE, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Failed to load Hunter cache: {e}")
+    return {}
+
+def save_hunter_cache(cache):
+    try:
+        with open(HUNTER_CACHE_FILE, 'w') as f:
+            json.dump(cache, f, indent=2)
+    except Exception as e:
+        print(f"Failed to save Hunter cache: {e}")
+
+def hunter_verify_email(email, cache):
+    """
+    Verify an email address using Hunter.io.
+    """
+    if not settings.HUNTER_API_KEY or not email:
+        return None
+        
+    cache_key = f"email:{email}"
+    if cache_key in cache:
+        return cache[cache_key]
+        
+    url = f"https://api.hunter.io/v2/email-verifier?email={email}&api_key={settings.HUNTER_API_KEY}"
+    
+    max_retries = 5
+    for attempt in range(max_retries):
+        try:
+            import requests
+            resp = requests.get(url, timeout=20)
+            
+            if resp.status_code == 200:
+                data = resp.json()
+                cache[cache_key] = data
+                save_hunter_cache(cache)
+                time.sleep(0.5)
+                return data
+            elif resp.status_code == 202:
+                print(f"⏳ Verification for {email} in progress (202). Retrying {attempt+1}/{max_retries}...")
+                time.sleep(2)
+                continue
+            else:
+                return None
+                
+        except Exception as e:
+            print(f"Hunter Verify error: {e}")
+            return None
+            
+    return None
+
+async def verify_email_background(lead_id: int, email: str, session: Session):
+    """
+    Background task to verify email using Hunter.io and update the DB.
+    """
+    if not settings.HUNTER_API_KEY:
+        print(f"Skipping verification for {email}: No API Key found.")
+        return
+
+    cache = load_hunter_cache()
+    result = hunter_verify_email(email, cache)
+    
+    if result:
+        verification_data = result.get("data", {})
+        result_status = verification_data.get("result")
+        
+        is_gibberish = verification_data.get("gibberish", False)
+        is_disposable = verification_data.get("disposable", False)
+        
+        if is_gibberish or is_disposable:
+            result_status = "invalid"
+        
+        lead = session.get(Lead, lead_id)
+        if lead:
+            lead.verified_status = result_status
+            session.add(lead)
+            session.commit()
+            print(f"Verified {email}: {result_status}")
+    else:
+        print(f"Could not verify {email}")
+
