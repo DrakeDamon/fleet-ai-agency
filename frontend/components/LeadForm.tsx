@@ -366,15 +366,15 @@ export default function LeadForm() {
   const getBookingContent = (riskLevel: string) => {
     if (riskLevel === 'LOW') {
         return {
-            headline: "⚠️ WAIT. Your Profit Report is Incomplete.",
+            headline: "⚠️ WAIT. We found Unverified Spend in your logs.",
             body: "Your safety score is perfect—but that makes you the #1 target for Fuel Theft. The PDF in your email is just a diagnosis. To validate your $20,000 Savings Guarantee, we need to calibrate your fuel data manually.",
             badge: "💰 POTENTIAL LOST SAVINGS: $20,000+",
-            badgeColor: "bg-green-100 text-green-800 border-green-200"
+            badgeColor: "bg-red-100 text-red-800 border-red-200" // RED for Financial Failure
         };
     } else {
         // Default to High/Critical Risk
         return {
-            headline: "🛑 STOP. Do Not Ignore This Alert.",
+            headline: "⚠️ WAIT. Your Insurance Profile is Critical.",
             body: "Your 'Conditional' rating is a financial bleeding wound. Every day you wait is costing you extra in insurance premiums. We cannot fix this via email.",
             badge: "🔥 URGENT: INSURANCE RISK DETECTED",
             badgeColor: "bg-red-100 text-red-800 border-red-200"
@@ -404,6 +404,14 @@ export default function LeadForm() {
                     </div>
 
                     <div className="p-6 md:p-8">
+                        {/* SCARCITY ALERT (Moved to Top) */}
+                        <div className="flex justify-center mb-6">
+                            <div className="inline-flex items-center gap-2 text-orange-800 font-bold text-sm bg-orange-100 px-4 py-2 rounded-lg border border-orange-200 animate-pulse">
+                                <AlertTriangle className="h-4 w-4" />
+                                Only 3 Priority Slots remain this week
+                            </div>
+                        </div>
+
                         {/* BADGE */}
                         <div className="flex justify-center mb-4">
                             <div className={`px-4 py-1.5 rounded-full border font-bold text-xs tracking-wide uppercase ${content.badgeColor}`}>
@@ -422,9 +430,10 @@ export default function LeadForm() {
                         </p>
 
                         {/* VIDEO SLOT */}
-                        <div className="aspect-video w-full bg-slate-900 rounded-xl shadow-lg mb-8 flex items-center justify-center text-white border border-slate-800 relative overflow-hidden group">
+                        <div className="w-full aspect-video rounded-lg overflow-hidden shadow-lg mb-6 relative bg-slate-900">
+                             {/* Placeholder for Autoplay Video - Ensure iframe has allow="autoplay" */}
                             <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-950"></div>
-                            <div className="relative z-10 flex flex-col items-center gap-3">
+                            <div className="relative z-10 flex flex-col items-center gap-3 h-full justify-center">
                                 <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
                                 <span className="text-sm font-medium text-slate-300 tracking-wider">VIDEO LOADING...</span>
                             </div>
@@ -448,21 +457,14 @@ export default function LeadForm() {
                             />
                         </div>
 
-                        {/* SCARCITY FOOTER */}
-                        <div className="text-center space-y-4">
-                            <div className="inline-flex items-center gap-2 text-orange-600 font-bold text-sm bg-orange-50 px-4 py-2 rounded-lg border border-orange-100">
-                                <AlertTriangle className="h-4 w-4" />
-                                Only 3 Priority Slots remain this week
-                            </div>
-                            
-                            <div>
-                                <button 
-                                    onClick={() => setShowBooking(false)}
-                                    className="text-slate-400 text-xs hover:text-slate-600 underline hover:no-underline transition-all"
-                                >
-                                    No thanks, I&apos;ll just wait for the PDF via email.
-                                </button>
-                            </div>
+                        {/* FOOTER LINKS */}
+                        <div className="text-center">
+                            <button 
+                                onClick={() => setShowBooking(false)}
+                                className="text-slate-400 text-xs hover:text-slate-600 underline hover:no-underline transition-all"
+                            >
+                                No thanks, I&apos;ll just wait for the PDF via email.
+                            </button>
                         </div>
                     </div>
                 </div>
