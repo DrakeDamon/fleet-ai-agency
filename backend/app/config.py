@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     
     # Resend
     RESEND_API_KEY: str | None = None
+    RESEND_API: str | None = None
     RESEND_AUDIENCE_ID: str | None = None
     
     # Render-specific: PORT is automatically set by Render

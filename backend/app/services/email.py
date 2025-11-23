@@ -3,7 +3,13 @@ import resend
 
 # Initialize Resend
 # Initialize Resend
-resend.api_key = os.environ.get("RESEND_API_KEY") or os.environ.get("RESEND_API")
+# Initialize Resend
+api_key = os.environ.get("RESEND_API_KEY") or os.environ.get("RESEND_API")
+if api_key:
+    resend.api_key = api_key.strip()
+    print(f"📧 Resend API Key Loaded: {resend.api_key[:5]}...{resend.api_key[-4:]}")
+else:
+    print("❌ Resend API Key NOT FOUND in environment variables.")
 
 def send_report_email(to_email: str, first_name: str, pdf_bytes: bytes, dot_number: str):
     """
