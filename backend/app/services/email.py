@@ -2,7 +2,8 @@ import os
 import resend
 
 # Initialize Resend
-resend.api_key = os.environ.get("RESEND_API_KEY")
+# Initialize Resend
+resend.api_key = os.environ.get("RESEND_API_KEY") or os.environ.get("RESEND_API")
 
 def send_report_email(to_email: str, first_name: str, pdf_bytes: bytes, dot_number: str):
     """
