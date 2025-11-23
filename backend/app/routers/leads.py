@@ -26,8 +26,8 @@ async def get_audit_preview(
 async def create_lead(
     request: Request, 
     lead: LeadCreate, 
+    background_tasks: BackgroundTasks,
     session: Session = Depends(get_session),
-    background_tasks: BackgroundTasks
 ):
     # 1. Create DB Object
     db_lead = Lead.from_orm(lead)
