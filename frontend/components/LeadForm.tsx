@@ -173,7 +173,7 @@ export default function LeadForm() {
             {/* BAD, BAD, BUT GOOD FRAMEWORK */}
             <div className="mt-4 space-y-2 text-left">
                 <p className="text-sm text-slate-700">
-                    <span className="font-bold text-red-600">⚠️ Bad:</span> This 'Conditional' trend means you are likely <strong>overpaying on insurance</strong> and <strong>losing broker bids</strong> right now.
+                    <span className="font-bold text-red-600">⚠️ Bad:</span> This &apos;Conditional&apos; trend means you are likely <strong>overpaying on insurance</strong> and <strong>losing broker bids</strong> right now.
                 </p>
                 <p className="text-sm text-green-700">
                     <span className="font-bold">✓ Good:</span> The specific data leaks causing this are visible to our AI. Enter your email to see the Fix Report immediately.
