@@ -4,6 +4,7 @@ import { useState } from "react";
 import { checkDotRisk, submitLead } from "../lib/api";
 import { FleetSize, Role, LeadFormData } from "../lib/types";
 import { Loader2, AlertTriangle, CheckCircle, ArrowRight, ChevronLeft } from "lucide-react";
+import { InlineWidget } from "react-calendly";
 
 export default function LeadForm() {
   // STATE MACHINE: 'input' -> 'analyzing' -> 'results' -> 'qualification' -> 'submitting' -> 'success'
@@ -24,6 +25,7 @@ export default function LeadForm() {
   });
 
   const [riskData, setRiskData] = useState<any>(null);
+  const [showBooking, setShowBooking] = useState(true);
 
   // HANDLERS
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -277,17 +279,65 @@ export default function LeadForm() {
     );
   }
 
-  // --- RENDER: STEP 4 (SUCCESS) ---
-  return (
-    <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
-        <div className="flex justify-center mb-4">
-            <CheckCircle className="h-16 w-16 text-green-600" />
+  // --- RENDER: STEP 4 (SUCCESS & BOOKING) ---
+  if (step === 'success') {
+    if (showBooking) {
+        return (
+            <div className="bg-white p-6 rounded-xl shadow-2xl border-2 border-orange-200">
+                <div className="text-center mb-4">
+                    <div className="inline-flex items-center gap-2 text-orange-600 font-bold text-lg animate-pulse">
+                        <AlertTriangle className="h-5 w-5" />
+                        WAIT. Your Risk Score is Higher Than Average.
+                    </div>
+                    <p className="text-slate-600 text-sm mt-2">
+                        Your Data Risk Snapshot has been sent to <strong>{formData.work_email}</strong>. 
+                        However, due to your critical risk factors, we have unlocked a <span className="font-bold text-slate-900">Priority Review Call</span> to explain these findings immediately.
+                    </p>
+                </div>
+
+                <div className="rounded-lg overflow-hidden border border-slate-200">
+                    <InlineWidget 
+                        url="https://calendly.com/drake-damon-fleet-ai/15min"
+                        prefill={{
+                            email: formData.work_email,
+                            name: formData.full_name,
+                            customAnswers: {
+                                a1: formData.pain_points, // Assuming 'a1' maps to a question in your Calendly
+                                a2: formData.phone
+                            }
+                        }}
+                        styles={{
+                            height: '450px'
+                        }}
+                    />
+                </div>
+
+                <div className="text-center mt-4">
+                    <button 
+                        onClick={() => setShowBooking(false)}
+                        className="text-slate-400 text-xs hover:text-slate-600 underline"
+                    >
+                        No thanks, I'll just wait for the PDF via email.
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    // STANDARD SUCCESS VIEW
+    return (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
+            <div className="flex justify-center mb-4">
+                <CheckCircle className="h-16 w-16 text-green-600" />
+            </div>
+            <h3 className="text-2xl font-bold text-green-800 mb-2">Report Generating...</h3>
+            <p className="text-green-700">
+                We are pulling your full FMCSA inspection history now. 
+                Check your email in 5-10 minutes for your <strong>Data Risk Snapshot</strong>.
+            </p>
         </div>
-        <h3 className="text-2xl font-bold text-green-800 mb-2">Report Generating...</h3>
-        <p className="text-green-700">
-            We are pulling your full FMCSA inspection history now. 
-            Check your email in 5-10 minutes for your <strong>Data Risk Snapshot</strong>.
-        </p>
-    </div>
-  );
+    );
+  }
+
+  return null;
 }
