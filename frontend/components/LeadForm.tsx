@@ -34,6 +34,14 @@ export default function LeadForm() {
   };
 
   const getUrgencyCopy = (painPoint?: PainPoint | string) => {
+    // Handle Low Risk Case explicitly if passed as a pain point or derived
+    if (riskData?.risk_level === 'LOW') {
+        return {
+            headline: "⚠️ WAIT. Protect your clean record.",
+            subtext: "You've mastered compliance. Now let's master profitability. Book your review to see where you can cut 10% of hidden costs."
+        };
+    }
+
     switch (painPoint) {
         case PainPoint.BROKER_FRAUD:
             return {
@@ -156,29 +164,62 @@ export default function LeadForm() {
       <div className="bg-white p-8 rounded-xl shadow-2xl border-2 border-red-100">
         {/* TEASER RESULTS */}
         <div className="text-center mb-6">
-            <div className="inline-flex items-center gap-2 text-red-600 font-bold text-xl mb-2">
-                <AlertTriangle className="h-6 w-6" />
-                🔴 HIGH RISK DETECTED
-            </div>
-            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-left space-y-2">
-                <p className="text-sm text-slate-600">
-                    <strong>Fleet:</strong> {riskData.company_name}
-                </p>
-                <p className="text-sm text-slate-600">
-                    <strong>Vehicle OOS:</strong> <span className="text-red-600 font-bold">{riskData.vehicle_oos_rate}%</span> 
-                    <span className="text-slate-400 text-xs ml-1">(National Avg: 22%)</span>
-                </p>
-            </div>
-            
-            {/* BAD, BAD, BUT GOOD FRAMEWORK */}
-            <div className="mt-4 space-y-2 text-left">
-                <p className="text-sm text-slate-700">
-                    <span className="font-bold text-red-600">⚠️ Bad:</span> This &apos;Conditional&apos; trend means you are likely <strong>overpaying on insurance</strong> and <strong>losing broker bids</strong> right now.
-                </p>
-                <p className="text-sm text-green-700">
-                    <span className="font-bold">✓ Good:</span> The specific data leaks causing this are visible to our AI. Enter your email to see the Fix Report immediately.
-                </p>
-            </div>
+            {riskData.risk_level === 'LOW' ? (
+                // SAFE PATH
+                <>
+                    <div className="inline-flex items-center gap-2 text-green-600 font-bold text-xl mb-2">
+                        <CheckCircle className="h-6 w-6" />
+                        ✅ DOT Safety Status: STRONG
+                    </div>
+                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-left space-y-2">
+                        <p className="text-sm text-slate-600">
+                            <strong>Fleet:</strong> {riskData.company_name}
+                        </p>
+                        <p className="text-sm text-slate-600">
+                            <strong>Vehicle OOS:</strong> <span className="text-green-600 font-bold">{riskData.vehicle_oos_rate}%</span> 
+                            <span className="text-slate-400 text-xs ml-1">(National Avg: 22%)</span>
+                        </p>
+                    </div>
+                    
+                    <div className="mt-4 space-y-2 text-left">
+                        <p className="text-sm text-slate-700">
+                            <span className="font-bold text-green-600">✓ Great Work:</span> Your compliance score is beating the National Average.
+                        </p>
+                        <p className="text-sm text-slate-700">
+                            <span className="font-bold text-red-600">⚠️ The Blind Spot:</span> Public safety data does not track <strong>Fuel Fraud</strong> or <strong>Over-Maintenance</strong>.
+                        </p>
+                        <p className="text-sm text-slate-500 italic">
+                            "Safe fleets your size typically lose $5,000/mo to internal financial leaks."
+                        </p>
+                    </div>
+                </>
+            ) : (
+                // RISK PATH
+                <>
+                    <div className="inline-flex items-center gap-2 text-red-600 font-bold text-xl mb-2">
+                        <AlertTriangle className="h-6 w-6" />
+                        🔴 HIGH RISK DETECTED
+                    </div>
+                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-left space-y-2">
+                        <p className="text-sm text-slate-600">
+                            <strong>Fleet:</strong> {riskData.company_name}
+                        </p>
+                        <p className="text-sm text-slate-600">
+                            <strong>Vehicle OOS:</strong> <span className="text-red-600 font-bold">{riskData.vehicle_oos_rate}%</span> 
+                            <span className="text-slate-400 text-xs ml-1">(National Avg: 22%)</span>
+                        </p>
+                    </div>
+                    
+                    <div className="mt-4 space-y-2 text-left">
+                        <p className="text-sm text-slate-700">
+                            <span className="font-bold text-red-600">⚠️ Bad:</span> This &apos;Conditional&apos; trend means you are likely <strong>overpaying on insurance</strong> and <strong>losing broker bids</strong> right now.
+                        </p>
+                        <p className="text-sm text-green-700">
+                            <span className="font-bold">✓ Good:</span> The specific data leaks causing this are visible to our AI. Enter your email to see the Fix Report immediately.
+                        </p>
+                    </div>
+                </>
+            )}
         </div>
 
         {/* THE GATE FORM */}

@@ -46,6 +46,13 @@ async def fetch_carrier_risk(dot_number: str):
             driver_oos = float(carrier.get("driverOosRate", 0))
             rating = carrier.get("safetyRating", "None")
             
+            # NEW: Crash Data Extraction
+            crashes = carrier.get("crashes", {})
+            fatal = int(crashes.get("fatal", 0))
+            injury = int(crashes.get("injury", 0))
+            tow = int(crashes.get("tow", 0))
+            total_crashes = fatal + injury + tow
+
             # LOGIC: The "Risk" Calculation
             risk_level = "LOW"
             flags = []
@@ -58,13 +65,17 @@ async def fetch_carrier_risk(dot_number: str):
                 risk_level = "CRITICAL"
                 flags.append("Safety Rating is CONDITIONAL (Insurance Risk)")
 
+            if total_crashes > 0:
+                flags.append(f"{total_crashes} Reportable Crashes (Potential Ghost Downtime)")
+
             return {
                 "company_name": carrier.get("legalName"),
                 "vehicle_oos_rate": vehicle_oos,
                 "driver_oos_rate": driver_oos,
                 "rating": rating,
                 "risk_level": risk_level,
-                "risk_flags": flags
+                "risk_flags": flags,
+                "total_crashes": total_crashes
             }
 
         except HTTPException as he:
