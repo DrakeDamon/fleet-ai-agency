@@ -317,7 +317,7 @@ export default function LeadForm() {
                         onClick={() => setShowBooking(false)}
                         className="text-slate-400 text-xs hover:text-slate-600 underline"
                     >
-                        No thanks, I'll just wait for the PDF via email.
+                        No thanks, I&apos;ll just wait for the PDF via email.
                     </button>
                 </div>
             </div>
