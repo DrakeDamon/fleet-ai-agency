@@ -28,7 +28,7 @@ def send_report_email(to_email: str, first_name: str, pdf_bytes: bytes, dot_numb
         params = {
             "from": "Fleet AI Agency <onboarding@resend.dev>", # Replace with verified domain in prod
             "to": [to_email],
-            "subject": f"URGENT: Your Fleet Risk Snapshot (DOT #{dot_number})",
+            "subject": f"ACTION REQUIRED: Your $20,000 Guarantee is Unclaimed (DOT #{dot_number})",
             "html": f"""
                 <p>Hi {first_name},</p>
                 <p>Your risk analysis is attached. We detected critical flags.</p>

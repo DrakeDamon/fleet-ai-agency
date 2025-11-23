@@ -131,14 +131,41 @@ def generate_risk_report(lead: Lead, fmcsa_data: dict) -> bytes:
     y -= 20
     c.drawString(0.7*inch, y, f"• Est. Unverified Fuel Spend (Fraud/Waste): ${est_fraud_loss:,.0f} / Month")
     
-    # --- 6. CALL TO ACTION (Footer) ---
-    c.setFillColor(colors.black)
-    c.setFont("Helvetica-Bold", 12)
-    c.drawCentredString(width/2, 100, "STOP THE BLEED. FIX YOUR DATA.")
+    # --- 6. DECISION MAKER BLOCK (The "Trojan Horse" CTA) ---
+    y -= 100
     
+    # Draw the Decision Maker Box
+    c.setFillColor(colors.HexColor("#F3F4F6"))  # Light Grey
+    c.setStrokeColor(colors.darkgrey)
+    c.rect(0.5*inch, y - 80, width - 1*inch, 100, fill=True, stroke=True)
+    
+    # Header
+    c.setFillColor(colors.black)
+    c.setFont("Helvetica-Bold", 14)
+    c.drawCentredString(width/2, y - 10, "FINAL ACTION REQUIRED: SECURE YOUR PROFIT PROTECTION")
+    
+    # Body Text
+    c.setFont("Helvetica", 10)
+    y -= 35
+    body_text = "To The Owner: This report identifies potential savings that trigger our $20,000 Performance Guarantee."
+    c.drawCentredString(width/2, y, body_text)
+    y -= 15
+    c.drawCentredString(width/2, y, "We found the leaks. Do not delegate this fix.")
+    
+    # CTA Button/Link
+    y -= 30
     c.setFillColor(colors.blue)
-    c.setFont("Helvetica-Oblique", 10)
-    c.drawCentredString(width/2, 80, "Book your full audit review: https://fleet-ai-agency.com/booking")
+    c.setFont("Helvetica-Bold", 11)
+    c.drawCentredString(width/2, y, "CLICK HERE: Book Your Guaranteed Profit Briefing")
+    c.setFont("Helvetica", 9)
+    c.setFillColor(colors.darkblue)
+    y -= 12
+    c.drawCentredString(width/2, y, "https://fleet-ai-agency.com/booking")
+    
+    # --- 7. COPYRIGHT FOOTER ---
+    c.setFillColor(colors.grey)
+    c.setFont("Helvetica", 8)
+    c.drawCentredString(width/2, 40, "© 2024 Fleet AI Agency. Confidential & Proprietary.")
     
     c.showPage()
     c.save()

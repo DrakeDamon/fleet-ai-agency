@@ -158,7 +158,7 @@ export default function LeadForm() {
         <div className="text-center mb-6">
             <div className="inline-flex items-center gap-2 text-red-600 font-bold text-xl mb-2">
                 <AlertTriangle className="h-6 w-6" />
-                {riskData.risk_level} RISK DETECTED
+                🔴 HIGH RISK DETECTED
             </div>
             <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-left space-y-2">
                 <p className="text-sm text-slate-600">
@@ -166,10 +166,17 @@ export default function LeadForm() {
                 </p>
                 <p className="text-sm text-slate-600">
                     <strong>Vehicle OOS:</strong> <span className="text-red-600 font-bold">{riskData.vehicle_oos_rate}%</span> 
-                    <span className="text-slate-400 text-xs ml-1">(Natl Avg: 22%)</span>
+                    <span className="text-slate-400 text-xs ml-1">(National Avg: 22%)</span>
                 </p>
-                <p className="text-xs text-slate-500 mt-2 italic">
-                    We found {riskData.risk_flags.length} critical data errors triggering this score.
+            </div>
+            
+            {/* BAD, BAD, BUT GOOD FRAMEWORK */}
+            <div className="mt-4 space-y-2 text-left">
+                <p className="text-sm text-slate-700">
+                    <span className="font-bold text-red-600">⚠️ Bad:</span> This 'Conditional' trend means you are likely <strong>overpaying on insurance</strong> and <strong>losing broker bids</strong> right now.
+                </p>
+                <p className="text-sm text-green-700">
+                    <span className="font-bold">✓ Good:</span> The specific data leaks causing this are visible to our AI. Enter your email to see the Fix Report immediately.
                 </p>
             </div>
         </div>
@@ -329,6 +336,12 @@ export default function LeadForm() {
                     </button>
 
                     <div className="text-center mb-6">
+                        <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-4">
+                            <div className="inline-flex items-center gap-2 text-orange-700 font-bold text-sm">
+                                <AlertTriangle className="h-4 w-4" />
+                                ⚠️ Limited Capacity: Reviews are conducted manually by Senior Analysts. Only 3 Priority Slots remain this week.
+                            </div>
+                        </div>
                         <div className="inline-flex items-center gap-2 text-orange-600 font-bold text-lg animate-pulse">
                             <AlertTriangle className="h-5 w-5" />
                             {getUrgencyCopy(formData.pain_points).headline}
