@@ -389,7 +389,7 @@ export default function LeadForm() {
         
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/95 backdrop-blur-sm p-4 overflow-y-auto">
-                <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full relative animate-in fade-in zoom-in duration-300 overflow-hidden my-8">
+                <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full relative animate-in fade-in zoom-in duration-300 overflow-hidden my-8">
                     {/* TOP BAR */}
                     <div className="bg-slate-100 px-6 py-3 border-b border-slate-200 flex justify-between items-center">
                         <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
@@ -404,67 +404,75 @@ export default function LeadForm() {
                     </div>
 
                     <div className="p-6 md:p-8">
-                        {/* SCARCITY ALERT (Moved to Top) */}
-                        <div className="flex justify-center mb-6">
-                            <div className="inline-flex items-center gap-2 text-orange-800 font-bold text-sm bg-orange-100 px-4 py-2 rounded-lg border border-orange-200 animate-pulse">
-                                <AlertTriangle className="h-4 w-4" />
-                                Only 3 Priority Slots remain this week
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            {/* LEFT COLUMN - THE HOOK */}
+                            <div className="flex flex-col h-full">
+                                {/* SCARCITY ALERT (Moved to Top) */}
+                                <div className="flex justify-center lg:justify-start mb-6">
+                                    <div className="inline-flex items-center gap-2 text-orange-800 font-bold text-sm bg-orange-100 px-4 py-2 rounded-lg border border-orange-200 animate-pulse">
+                                        <AlertTriangle className="h-4 w-4" />
+                                        Only 3 Priority Slots remain this week
+                                    </div>
+                                </div>
+
+                                {/* BADGE */}
+                                <div className="flex justify-center lg:justify-start mb-4">
+                                    <div className={`px-4 py-1.5 rounded-full border font-bold text-xs tracking-wide uppercase ${content.badgeColor}`}>
+                                        {content.badge}
+                                    </div>
+                                </div>
+
+                                {/* HEADLINE */}
+                                <h2 className="text-2xl md:text-3xl font-bold text-slate-900 text-center lg:text-left mb-4 leading-tight">
+                                    {content.headline}
+                                </h2>
+
+                                {/* BODY */}
+                                <p className="text-slate-600 text-center lg:text-left mb-8 leading-relaxed">
+                                    {content.body}
+                                </p>
+
+                                {/* VIDEO SLOT */}
+                                <div className="w-full aspect-video rounded-lg overflow-hidden shadow-lg mb-6 relative bg-slate-900 mt-auto">
+                                     {/* Placeholder for Autoplay Video - Ensure iframe has allow="autoplay" */}
+                                    <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-950"></div>
+                                    <div className="relative z-10 flex flex-col items-center gap-3 h-full justify-center">
+                                        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+                                        <span className="text-sm font-medium text-slate-300 tracking-wider">VIDEO LOADING...</span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
 
-                        {/* BADGE */}
-                        <div className="flex justify-center mb-4">
-                            <div className={`px-4 py-1.5 rounded-full border font-bold text-xs tracking-wide uppercase ${content.badgeColor}`}>
-                                {content.badge}
+                            {/* RIGHT COLUMN - THE ACTION */}
+                            <div className="flex flex-col h-full">
+                                {/* CALENDAR */}
+                                <div className="rounded-xl overflow-hidden border-2 border-slate-100 shadow-xl bg-white mb-6 flex-grow">
+                                    <InlineWidget 
+                                        url="https://calendly.com/drake-damon-fleet-ai/15min"
+                                        prefill={{
+                                            email: formData.work_email,
+                                            name: formData.full_name,
+                                            customAnswers: {
+                                                a1: formData.pain_points, 
+                                                a2: formData.phone
+                                            }
+                                        }}
+                                        styles={{
+                                            height: '500px'
+                                        }}
+                                    />
+                                </div>
+
+                                {/* FOOTER LINKS */}
+                                <div className="text-center">
+                                    <button 
+                                        onClick={() => setShowBooking(false)}
+                                        className="text-slate-400 text-xs hover:text-slate-600 underline hover:no-underline transition-all"
+                                    >
+                                        No thanks, I&apos;ll just wait for the PDF via email.
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-
-                        {/* HEADLINE */}
-                        <h2 className="text-2xl md:text-3xl font-bold text-slate-900 text-center mb-4 leading-tight">
-                            {content.headline}
-                        </h2>
-
-                        {/* BODY */}
-                        <p className="text-slate-600 text-center mb-8 max-w-lg mx-auto leading-relaxed">
-                            {content.body}
-                        </p>
-
-                        {/* VIDEO SLOT */}
-                        <div className="w-full aspect-video rounded-lg overflow-hidden shadow-lg mb-6 relative bg-slate-900">
-                             {/* Placeholder for Autoplay Video - Ensure iframe has allow="autoplay" */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-950"></div>
-                            <div className="relative z-10 flex flex-col items-center gap-3 h-full justify-center">
-                                <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-                                <span className="text-sm font-medium text-slate-300 tracking-wider">VIDEO LOADING...</span>
-                            </div>
-                        </div>
-
-                        {/* CALENDAR */}
-                        <div className="rounded-xl overflow-hidden border-2 border-slate-100 shadow-xl bg-white mb-6">
-                            <InlineWidget 
-                                url="https://calendly.com/drake-damon-fleet-ai/15min"
-                                prefill={{
-                                    email: formData.work_email,
-                                    name: formData.full_name,
-                                    customAnswers: {
-                                        a1: formData.pain_points, 
-                                        a2: formData.phone
-                                    }
-                                }}
-                                styles={{
-                                    height: '500px'
-                                }}
-                            />
-                        </div>
-
-                        {/* FOOTER LINKS */}
-                        <div className="text-center">
-                            <button 
-                                onClick={() => setShowBooking(false)}
-                                className="text-slate-400 text-xs hover:text-slate-600 underline hover:no-underline transition-all"
-                            >
-                                No thanks, I&apos;ll just wait for the PDF via email.
-                            </button>
                         </div>
                     </div>
                 </div>
