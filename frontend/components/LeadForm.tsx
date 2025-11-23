@@ -363,60 +363,107 @@ export default function LeadForm() {
     );
   }
 
+  const getBookingContent = (riskLevel: string) => {
+    if (riskLevel === 'LOW') {
+        return {
+            headline: "⚠️ WAIT. Your Profit Report is Incomplete.",
+            body: "Your safety score is perfect—but that makes you the #1 target for Fuel Theft. The PDF in your email is just a diagnosis. To validate your $20,000 Savings Guarantee, we need to calibrate your fuel data manually.",
+            badge: "💰 POTENTIAL LOST SAVINGS: $20,000+",
+            badgeColor: "bg-green-100 text-green-800 border-green-200"
+        };
+    } else {
+        // Default to High/Critical Risk
+        return {
+            headline: "🛑 STOP. Do Not Ignore This Alert.",
+            body: "Your 'Conditional' rating is a financial bleeding wound. Every day you wait is costing you extra in insurance premiums. We cannot fix this via email.",
+            badge: "🔥 URGENT: INSURANCE RISK DETECTED",
+            badgeColor: "bg-red-100 text-red-800 border-red-200"
+        };
+    }
+  };
+
   // --- RENDER: STEP 4 (SUCCESS & BOOKING) ---
   if (step === 'success') {
     if (showBooking) {
+        const content = getBookingContent(riskData?.risk_level || 'HIGH');
+        
         return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/90 backdrop-blur-sm">
-                <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-lg w-full relative animate-in fade-in zoom-in duration-300">
-                    <button 
-                        onClick={() => setShowBooking(false)}
-                        className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
-                    >
-                        <X className="h-6 w-6" />
-                    </button>
-
-                    <div className="text-center mb-6">
-                        <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-4">
-                            <div className="inline-flex items-center gap-2 text-orange-700 font-bold text-sm">
-                                <AlertTriangle className="h-4 w-4" />
-                                ⚠️ Limited Capacity: Reviews are conducted manually by Senior Analysts. Only 3 Priority Slots remain this week.
-                            </div>
-                        </div>
-                        <div className="inline-flex items-center gap-2 text-orange-600 font-bold text-lg animate-pulse">
-                            <AlertTriangle className="h-5 w-5" />
-                            {getUrgencyCopy(formData.pain_points).headline}
-                        </div>
-                        <p className="text-slate-600 text-sm mt-2">
-                            Your Data Risk Snapshot has been sent to <strong>{formData.work_email}</strong>. 
-                            However, due to your critical risk factors, we have unlocked a <span className="font-bold text-slate-900">Priority Review Call</span> {getUrgencyCopy(formData.pain_points).subtext}
-                        </p>
-                    </div>
-
-                    <div className="rounded-lg overflow-hidden border border-slate-200">
-                        <InlineWidget 
-                            url="https://calendly.com/drake-damon-fleet-ai/15min"
-                            prefill={{
-                                email: formData.work_email,
-                                name: formData.full_name,
-                                customAnswers: {
-                                    a1: formData.pain_points, // Assuming 'a1' maps to a question in your Calendly
-                                    a2: formData.phone
-                                }
-                            }}
-                            styles={{
-                                height: '450px'
-                            }}
-                        />
-                    </div>
-
-                    <div className="text-center mt-4">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/95 backdrop-blur-sm p-4 overflow-y-auto">
+                <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full relative animate-in fade-in zoom-in duration-300 overflow-hidden my-8">
+                    {/* TOP BAR */}
+                    <div className="bg-slate-100 px-6 py-3 border-b border-slate-200 flex justify-between items-center">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                            Step 3 of 3: Implementation
+                        </span>
                         <button 
                             onClick={() => setShowBooking(false)}
-                            className="text-slate-400 text-xs hover:text-slate-600 underline"
+                            className="text-slate-400 hover:text-slate-600 transition-colors"
                         >
-                            No thanks, I&apos;ll just wait for the PDF via email.
+                            <X className="h-5 w-5" />
                         </button>
+                    </div>
+
+                    <div className="p-6 md:p-8">
+                        {/* BADGE */}
+                        <div className="flex justify-center mb-4">
+                            <div className={`px-4 py-1.5 rounded-full border font-bold text-xs tracking-wide uppercase ${content.badgeColor}`}>
+                                {content.badge}
+                            </div>
+                        </div>
+
+                        {/* HEADLINE */}
+                        <h2 className="text-2xl md:text-3xl font-bold text-slate-900 text-center mb-4 leading-tight">
+                            {content.headline}
+                        </h2>
+
+                        {/* BODY */}
+                        <p className="text-slate-600 text-center mb-8 max-w-lg mx-auto leading-relaxed">
+                            {content.body}
+                        </p>
+
+                        {/* VIDEO SLOT */}
+                        <div className="aspect-video w-full bg-slate-900 rounded-xl shadow-lg mb-8 flex items-center justify-center text-white border border-slate-800 relative overflow-hidden group">
+                            <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-950"></div>
+                            <div className="relative z-10 flex flex-col items-center gap-3">
+                                <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+                                <span className="text-sm font-medium text-slate-300 tracking-wider">VIDEO LOADING...</span>
+                            </div>
+                        </div>
+
+                        {/* CALENDAR */}
+                        <div className="rounded-xl overflow-hidden border-2 border-slate-100 shadow-xl bg-white mb-6">
+                            <InlineWidget 
+                                url="https://calendly.com/drake-damon-fleet-ai/15min"
+                                prefill={{
+                                    email: formData.work_email,
+                                    name: formData.full_name,
+                                    customAnswers: {
+                                        a1: formData.pain_points, 
+                                        a2: formData.phone
+                                    }
+                                }}
+                                styles={{
+                                    height: '500px'
+                                }}
+                            />
+                        </div>
+
+                        {/* SCARCITY FOOTER */}
+                        <div className="text-center space-y-4">
+                            <div className="inline-flex items-center gap-2 text-orange-600 font-bold text-sm bg-orange-50 px-4 py-2 rounded-lg border border-orange-100">
+                                <AlertTriangle className="h-4 w-4" />
+                                Only 3 Priority Slots remain this week
+                            </div>
+                            
+                            <div>
+                                <button 
+                                    onClick={() => setShowBooking(false)}
+                                    className="text-slate-400 text-xs hover:text-slate-600 underline hover:no-underline transition-all"
+                                >
+                                    No thanks, I&apos;ll just wait for the PDF via email.
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
