@@ -189,7 +189,7 @@ export default function LeadForm() {
                             <span className="font-bold text-red-600">⚠️ The Blind Spot:</span> Public safety data does not track <strong>Fuel Fraud</strong> or <strong>Over-Maintenance</strong>.
                         </p>
                         <p className="text-sm text-slate-500 italic">
-                            "Safe fleets your size typically lose $5,000/mo to internal financial leaks."
+                            &quot;Safe fleets your size typically lose $5,000/mo to internal financial leaks.&quot;
                         </p>
                     </div>
                 </>
