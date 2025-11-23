@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { checkDotRisk, submitLead } from "../lib/api";
 import { FleetSize, Role, LeadFormData } from "../lib/types";
-import { Loader2, AlertTriangle, CheckCircle, ArrowRight, ChevronLeft } from "lucide-react";
+import { Loader2, AlertTriangle, CheckCircle, ArrowRight, ChevronLeft, X } from "lucide-react";
 import { InlineWidget } from "react-calendly";
 
 export default function LeadForm() {
@@ -283,42 +283,51 @@ export default function LeadForm() {
   if (step === 'success') {
     if (showBooking) {
         return (
-            <div className="bg-white p-6 rounded-xl shadow-2xl border-2 border-orange-200">
-                <div className="text-center mb-4">
-                    <div className="inline-flex items-center gap-2 text-orange-600 font-bold text-lg animate-pulse">
-                        <AlertTriangle className="h-5 w-5" />
-                        WAIT. Your Risk Score is Higher Than Average.
-                    </div>
-                    <p className="text-slate-600 text-sm mt-2">
-                        Your Data Risk Snapshot has been sent to <strong>{formData.work_email}</strong>. 
-                        However, due to your critical risk factors, we have unlocked a <span className="font-bold text-slate-900">Priority Review Call</span> to explain these findings immediately.
-                    </p>
-                </div>
-
-                <div className="rounded-lg overflow-hidden border border-slate-200">
-                    <InlineWidget 
-                        url="https://calendly.com/drake-damon-fleet-ai/15min"
-                        prefill={{
-                            email: formData.work_email,
-                            name: formData.full_name,
-                            customAnswers: {
-                                a1: formData.pain_points, // Assuming 'a1' maps to a question in your Calendly
-                                a2: formData.phone
-                            }
-                        }}
-                        styles={{
-                            height: '450px'
-                        }}
-                    />
-                </div>
-
-                <div className="text-center mt-4">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/90 backdrop-blur-sm">
+                <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-lg w-full relative animate-in fade-in zoom-in duration-300">
                     <button 
                         onClick={() => setShowBooking(false)}
-                        className="text-slate-400 text-xs hover:text-slate-600 underline"
+                        className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
                     >
-                        No thanks, I&apos;ll just wait for the PDF via email.
+                        <X className="h-6 w-6" />
                     </button>
+
+                    <div className="text-center mb-6">
+                        <div className="inline-flex items-center gap-2 text-orange-600 font-bold text-lg animate-pulse">
+                            <AlertTriangle className="h-5 w-5" />
+                            WAIT. Your Risk Score is Higher Than Average.
+                        </div>
+                        <p className="text-slate-600 text-sm mt-2">
+                            Your Data Risk Snapshot has been sent to <strong>{formData.work_email}</strong>. 
+                            However, due to your critical risk factors, we have unlocked a <span className="font-bold text-slate-900">Priority Review Call</span> to fix these violations and prevent a potential insurance hike immediately.
+                        </p>
+                    </div>
+
+                    <div className="rounded-lg overflow-hidden border border-slate-200">
+                        <InlineWidget 
+                            url="https://calendly.com/drake-damon-fleet-ai/15min"
+                            prefill={{
+                                email: formData.work_email,
+                                name: formData.full_name,
+                                customAnswers: {
+                                    a1: formData.pain_points, // Assuming 'a1' maps to a question in your Calendly
+                                    a2: formData.phone
+                                }
+                            }}
+                            styles={{
+                                height: '450px'
+                            }}
+                        />
+                    </div>
+
+                    <div className="text-center mt-4">
+                        <button 
+                            onClick={() => setShowBooking(false)}
+                            className="text-slate-400 text-xs hover:text-slate-600 underline"
+                        >
+                            No thanks, I&apos;ll just wait for the PDF via email.
+                        </button>
+                    </div>
                 </div>
             </div>
         );
