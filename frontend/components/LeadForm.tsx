@@ -434,12 +434,13 @@ export default function LeadForm() {
 
                                 {/* VIDEO SLOT */}
                                 <div className="w-full aspect-video rounded-lg overflow-hidden shadow-lg mb-6 relative bg-slate-900 mt-auto">
-                                     {/* Placeholder for Autoplay Video - Ensure iframe has allow="autoplay" */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-950"></div>
-                                    <div className="relative z-10 flex flex-col items-center gap-3 h-full justify-center">
-                                        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-                                        <span className="text-sm font-medium text-slate-300 tracking-wider">VIDEO LOADING...</span>
-                                    </div>
+                                    <iframe 
+                                        src="https://player.vimeo.com/video/1140156854?autoplay=1&title=0&byline=0&portrait=0" 
+                                        className="absolute top-0 left-0 w-full h-full" 
+                                        frameBorder="0" 
+                                        allow="autoplay; fullscreen; picture-in-picture" 
+                                        allowFullScreen
+                                    ></iframe>
                                 </div>
                             </div>
 

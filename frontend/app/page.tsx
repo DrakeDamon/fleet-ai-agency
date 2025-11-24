@@ -4,7 +4,7 @@ import { Check, TrendingUp, AlertTriangle, ShieldAlert } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Fleet Data Audit | Cut Downtime & Fuel Fraud",
-  description: "Specialized AI diagnostics for fleets with 10-100 trucks. Uncover hidden costs in your ELD and Fuel data.",
+  description: "Specialized AI diagnostics for fleets with 20-100 trucks. Uncover hidden costs in your ELD and Fuel data.",
 };
 
 export default function Home() {
@@ -31,7 +31,7 @@ export default function Home() {
         <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
           <div className="z-10">
             <div className="inline-block bg-blue-600/20 text-blue-300 px-3 py-1 rounded-full text-sm font-semibold mb-6 border border-blue-500/30">
-              For Fleets with 10–100 Power Units
+              For Fleets with 20–100 Power Units
             </div>
             <h1 className="text-5xl font-bold leading-tight mb-6">
               Stop Bleeding Profit to <span className="text-blue-400">Breakdowns</span> & <span className="text-orange-400">Fraud</span>.
@@ -128,12 +128,7 @@ export default function Home() {
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-slate-900 text-slate-400 py-12 text-center text-sm">
-        <div className="container mx-auto px-4">
-          <p className="mb-4">The Data & AI Clarity Agency™</p>
-          <p className="opacity-50">We use public FMCSA data for qualification. Not affiliated with the DOT.</p>
-        </div>
-      </footer>
+
     </main>
   );
 }
