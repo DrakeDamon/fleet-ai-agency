@@ -22,7 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <Script
-          src={process.env.NEXT_PUBLIC_TERMLY_URL}
+          src="https://app.termly.io/resource-blocker/8e2bffdc-c7a1-4ba1-9655-e4be2242744c?autoBlock=on"
           strategy="beforeInteractive"
         />
       </head>
