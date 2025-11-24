@@ -28,7 +28,7 @@ def send_report_email(to_email: str, first_name: str, pdf_bytes: bytes, dot_numb
         params = {
             "from": f"Fleet Clarity Audit Team <{os.environ.get('SENDER_EMAIL', 'audit@fleetclarity.io')}>",
             "to": [to_email],
-            "subject": f"ACTION REQUIRED: Your $20,000 Guarantee is Unclaimed (DOT #{dot_number})",
+            "subject": f"Your Fleet Data Snapshot (DOT #{dot_number})",
             "html": f"""
                 <p>Hi {first_name},</p>
                 <p>Your risk analysis is attached. We detected critical flags.</p>
