@@ -9,11 +9,11 @@ from app.config import settings
 
 # --- CONFIGURATION ---
 # Initialize Resend API Key
-api_key = os.environ.get("RESEND_API_KEY")
+api_key = os.environ.get("RESEND_API")
 if api_key:
     resend.api_key = api_key.strip()
 else:
-    print("❌ Resend API Key NOT FOUND in environment variables.")
+    print("❌ Resend API Key (RESEND_API) NOT FOUND in environment variables.")
 
 # Official Calendly Link (from environment variable)
 # Official Calendly Link (from environment variable)
