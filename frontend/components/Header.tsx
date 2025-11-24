@@ -4,9 +4,9 @@ import Link from "next/link";
 export default function Header() {
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+      <div className="w-full px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-            <div className="relative h-10 w-40">
+            <div className="relative h-14 w-48">
                 <Image
                     src="/logos/fleet logo.png"
                     alt="Fleet Clarity"
