@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { checkDotRisk, submitLead } from "../lib/api";
-import { FleetSize, Role, LeadFormData, PainPoint } from "../lib/types";
+import { FleetSize, Role, LeadFormData, PainPoint, RiskData } from "../lib/types";
 import { Loader2, AlertTriangle, CheckCircle, ArrowRight, ChevronLeft, X } from "lucide-react";
 import { InlineWidget } from "react-calendly";
 
@@ -24,51 +24,13 @@ export default function LeadForm() {
     tech_stack: "",
   });
 
-  const [riskData, setRiskData] = useState<any>(null);
+  const [riskData, setRiskData] = useState<RiskData | null>(null);
   const [showBooking, setShowBooking] = useState(true);
 
   // HANDLERS
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const getUrgencyCopy = (painPoint?: PainPoint | string) => {
-    // Handle Low Risk Case explicitly if passed as a pain point or derived
-    if (riskData?.risk_level === 'LOW') {
-        return {
-            headline: "⚠️ WAIT. Protect your clean record.",
-            subtext: "You've mastered compliance. Now let's master profitability. Book your review to see where you can cut 10% of hidden costs."
-        };
-    }
-
-    switch (painPoint) {
-        case PainPoint.BROKER_FRAUD:
-            return {
-                headline: "⚠️ WAIT. Your Authority is at Risk.",
-                subtext: "...target for Double Brokering scams..."
-            };
-        case PainPoint.INSURANCE:
-            return {
-                headline: "⚠️ WAIT. Your Premium is about to jump.",
-                subtext: "...liability causing rate hikes..."
-            };
-        case PainPoint.DOWNTIME:
-            return {
-                headline: "⚠️ WAIT. Your Trucks are failing inspection.",
-                subtext: "...maintenance violations leading to shut-downs..."
-            };
-        case PainPoint.FUEL_THEFT:
-            return {
-                headline: "⚠️ WAIT. Your Fuel Costs are Bleeding Profit.",
-                subtext: "...unverified fuel card transactions..."
-            };
-        default:
-            return {
-                headline: "⚠️ WAIT. Your Risk Score is Higher Than Average.",
-                subtext: "...to fix these violations and prevent a potential insurance hike immediately."
-            };
-    }
   };
 
   const runInstantAudit = async (e: React.FormEvent) => {
@@ -160,6 +122,8 @@ export default function LeadForm() {
 
   // --- RENDER: STEP 2 (THE TEASER & GATE) ---
   if (step === 'results') {
+    if (!riskData) return null;
+    
     return (
       <div className="bg-white p-8 rounded-xl shadow-2xl border-2 border-red-100">
         {/* TEASER RESULTS */}

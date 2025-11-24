@@ -35,7 +35,6 @@ export async function submitLead(data: LeadFormData): Promise<{ success: boolean
 
 export async function checkDotRisk(dotNumber: string) {
   try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
     const res = await fetch(`${API_URL}/api/v1/leads/audit/preview/${dotNumber}`);
     if (!res.ok) {
       const error = await res.json().catch(() => ({}));

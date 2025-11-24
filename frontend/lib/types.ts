@@ -42,3 +42,14 @@ export interface LeadFormData {
 export interface ApiError {
   detail: string | { loc: string[]; msg: string; type: string }[];
 }
+
+export interface RiskData {
+  risk_level: "LOW" | "HIGH" | "CRITICAL";
+  risk_flags: string[];
+  vehicle_oos_rate: number;
+  driver_oos_rate: number;
+  crash_rate: number;
+  company_name: string;
+  dot_number: string;
+  safety_rating?: string;
+}
