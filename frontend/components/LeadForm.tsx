@@ -448,7 +448,7 @@ export default function LeadForm() {
                                 {/* CALENDAR */}
                                 <div className="rounded-xl overflow-hidden border-2 border-slate-100 shadow-xl bg-white mb-6 flex-grow">
                                     <InlineWidget 
-                                        url="https://calendly.com/drake-damon-fleet-ai/15min"
+                                        url="https://calendly.com/drakedamon-fleetclarity/30min"
                                         prefill={{
                                             email: formData.work_email,
                                             name: formData.full_name,
