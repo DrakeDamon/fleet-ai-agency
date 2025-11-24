@@ -16,7 +16,8 @@ else:
     print("❌ Resend API Key NOT FOUND in environment variables.")
 
 # Official Calendly Link (from environment variable)
-CALENDLY_URL = os.environ.get("CALENDLY_URL", "https://calendly.com/drakedamon-fleetclarity/30min")
+# Official Calendly Link (from environment variable)
+CALENDLY_URL = os.environ.get("CALENDLY_URL")
 
 
 def send_report_email(to_email: str, first_name: str, pdf_bytes: bytes, dot_number: str):
@@ -28,7 +29,7 @@ def send_report_email(to_email: str, first_name: str, pdf_bytes: bytes, dot_numb
         attachment_content = list(pdf_bytes)
         
         # 1. Sender Identity (Use your verified alias)
-        sender_email = os.environ.get("SENDER_EMAIL", "audit@fleetclarity.io")
+        sender_email = os.environ.get("SENDER_EMAIL")
         from_address = f"Fleet Clarity Audit Team <{sender_email}>"
 
         # 2. The High-Conversion HTML Body

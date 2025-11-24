@@ -399,7 +399,7 @@ export default function LeadForm() {
                                 {/* VIDEO SLOT */}
                                 <div className="w-full aspect-video rounded-lg overflow-hidden shadow-lg mb-6 relative bg-slate-900 mt-auto">
                                     <iframe 
-                                        src="https://player.vimeo.com/video/1140156854?autoplay=1&title=0&byline=0&portrait=0" 
+                                        src={process.env.NEXT_PUBLIC_VIMEO_URL} 
                                         className="absolute top-0 left-0 w-full h-full" 
                                         frameBorder="0" 
                                         allow="autoplay; fullscreen; picture-in-picture" 
@@ -413,7 +413,7 @@ export default function LeadForm() {
                                 {/* CALENDAR */}
                                 <div className="rounded-xl overflow-hidden border-2 border-slate-100 shadow-xl bg-white mb-6 flex-grow">
                                     <InlineWidget 
-                                        url={process.env.NEXT_PUBLIC_CALENDLY_URL || "https://calendly.com/drakedamon-fleetclarity/30min"}
+                                        url={process.env.NEXT_PUBLIC_CALENDLY_URL!}
                                         prefill={{
                                             email: formData.work_email,
                                             name: formData.full_name,
