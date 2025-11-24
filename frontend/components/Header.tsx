@@ -12,6 +12,7 @@ export default function Header() {
                     alt="Fleet Clarity"
                     fill
                     className="object-contain object-left"
+                    sizes="(max-width: 768px) 100vw, 200px"
                     priority
                 />
             </div>

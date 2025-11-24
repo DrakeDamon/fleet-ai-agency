@@ -404,6 +404,8 @@ export default function LeadForm() {
                                         frameBorder="0" 
                                         allow="autoplay; fullscreen; picture-in-picture" 
                                         allowFullScreen
+                                        loading="lazy"
+                                        title="Fleet Clarity Audit Process Video"
                                     ></iframe>
                                 </div>
                             </div>
