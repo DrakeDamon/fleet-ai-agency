@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { checkDotRisk, submitLead } from "../lib/api";
 import { FleetSize, Role, LeadFormData, PainPoint, RiskData } from "../lib/types";
-import { Loader2, AlertTriangle, CheckCircle, ArrowRight, ChevronLeft, X } from "lucide-react";
+import { Loader2, AlertTriangle, CheckCircle, ArrowRight, ChevronLeft, X, ShieldCheck, Lock, FileCheck } from "lucide-react";
 import { InlineWidget } from "react-calendly";
 
 export default function LeadForm() {
@@ -119,9 +119,22 @@ export default function LeadForm() {
             {step === 'analyzing' ? (
                 <><Loader2 className="animate-spin" /> Analyzing FMCSA Database...</>
             ) : (
-                "Check My Risk Score"
+                "Request Fleet Diagnostic"
             )}
           </button>
+          
+          {/* Trust Signals */}
+          <div className="flex gap-4 justify-center mt-4 text-slate-400 text-xs font-semibold">
+            <div className="flex items-center gap-1">
+                <Lock className="w-3 h-3" /> AES-256
+            </div>
+            <div className="flex items-center gap-1">
+                <ShieldCheck className="w-3 h-3" /> SOC 2
+            </div>
+            <div className="flex items-center gap-1">
+                <FileCheck className="w-3 h-3" /> FMCSA Verified
+            </div>
+          </div>
         </form>
       </div>
     );

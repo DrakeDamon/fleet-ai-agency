@@ -16,24 +16,9 @@ export default function Hero() {
             Generic telematics stops at data. We deploy proprietary AI anomaly detection models to expose systemic fraud and utilization loss, guaranteeing actionable profit recovery. The $7,500 Forensic Audit is the mandatory first step to restore financial control and begin risk mitigation.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 mb-8">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all text-lg">
-                Request Fleet Diagnostic
-            </button>
-          </div>
+          {/* Button Removed */}
 
-          {/* Trust Signals */}
-          <div className="flex flex-wrap gap-6 items-center text-slate-500 text-sm font-semibold">
-            <div className="flex items-center gap-2">
-                <Lock className="w-4 h-4" /> AES-256 Encryption
-            </div>
-            <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4" /> SOC 2 Architecture
-            </div>
-            <div className="flex items-center gap-2">
-                <FileCheck className="w-4 h-4" /> FMCSA Verified
-            </div>
-          </div>
+          {/* Trust Signals Removed */}
 
           <div className="mt-8 pt-8 border-t border-slate-800">
              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-3">Trusted By Fleets Using</p>
