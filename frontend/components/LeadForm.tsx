@@ -184,7 +184,8 @@ export default function LeadForm() {
             <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center">
                 <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Driver OOS</div>
                 <div className={`text-lg md:text-xl font-black ${riskData.driver_oos_rate > 5 ? 'text-orange-600' : 'text-slate-900'}`}>
-                    {riskData.driver_oos_rate}%
+                    {riskData.driver_oos_rate.toFixed(1)}%
+                    <span className="text-xs text-slate-400 block font-normal mt-1">(Natl Avg: 3.81%)</span>
                 </div>
             </div>
         </div>
@@ -198,7 +199,7 @@ export default function LeadForm() {
                         WARNING: CRITICAL LIABILITY EXPOSURE DETECTED
                     </h4>
                     <p className="text-red-700 text-sm leading-relaxed">
-                        Your <strong>{riskData.rating}</strong> rating and <strong>{riskData.driver_oos_rate}%</strong> Driver OOS rate confirm you are operating in a High-Risk status. 
+                        Your <strong>{riskData.rating}</strong> rating and Driver OOS rate confirm you are operating in a High-Risk status. 
                         This exposure, coupled with your crash history, is costing you <strong>$25,000+ per incident</strong> in unmitigated insurance liability.
                     </p>
                 </>
