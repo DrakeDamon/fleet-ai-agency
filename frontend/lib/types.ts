@@ -52,5 +52,7 @@ export interface RiskData {
   company_name: string;
   dot_number: string;
   safety_rating?: string;
+  rating?: string;
+  total_crashes: number;
   fleet_size?: number;
 }

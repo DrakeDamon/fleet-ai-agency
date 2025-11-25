@@ -7,7 +7,7 @@ export default function Hero() {
       <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
         <div className="z-10">
           <div className="inline-block bg-blue-600/20 text-blue-300 px-3 py-1 rounded-full text-sm font-semibold mb-6 border border-blue-500/30">
-            For Fleets with 20–100 Power Units
+            For Fleets with 20–100+ Power Units
           </div>
           <h1 className="text-4xl lg:text-5xl font-bold leading-tight mb-6">
             STOP Funding Fleet Failure: Instantly Quantify the Hidden <span className="text-red-400">$250K Corporate Liability</span> in Your Operational Data.

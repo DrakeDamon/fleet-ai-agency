@@ -140,97 +140,107 @@ export default function LeadForm() {
     );
   }
 
-  // --- RENDER: STEP 2 (THE TEASER & GATE) ---
+  // --- RENDER: STEP 2 (THE REVEAL & GATE) ---
   if (step === 'results') {
     if (!riskData) return null;
     
+    // Determine Theme based on Risk
+    const isHighRisk = riskData.risk_level === 'HIGH' || riskData.risk_level === 'CRITICAL';
+    const themeColor = isHighRisk ? 'red' : 'blue';
+    const borderColor = isHighRisk ? 'border-red-200' : 'border-blue-200';
+    const bgColor = isHighRisk ? 'bg-red-50' : 'bg-blue-50';
+
     return (
-      <div className="bg-white p-8 rounded-xl shadow-2xl border-2 border-red-100">
-        {/* TEASER RESULTS */}
-        <div className="text-center mb-6">
-            <div className="inline-flex items-center gap-2 text-green-600 font-bold text-xl mb-2">
-                <CheckCircle className="h-6 w-6" />
-                ✅ Enterprise Profile Detected
+      <div className={`bg-white p-8 rounded-xl shadow-2xl border-2 ${borderColor}`}>
+        {/* 1. HERO HEADLINE */}
+        <div className="text-center mb-8">
+            <h3 className="text-2xl md:text-3xl font-bold text-slate-900 leading-tight">
+                CRITICAL FINDINGS: <br/>
+                <span className={isHighRisk ? "text-red-600" : "text-blue-600"}>
+                    Your Fleet’s Valuation Defense Score is Compromised.
+                </span>
+            </h3>
+        </div>
+
+        {/* 2. DATA SCORECARD (VISUAL ANCHOR) */}
+        <div className="grid grid-cols-3 gap-2 md:gap-4 mb-8">
+            {/* Tile 1: Safety Rating */}
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center">
+                <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Safety Rating</div>
+                <div className={`text-lg md:text-xl font-black ${riskData.rating === 'Conditional' ? 'text-red-600' : 'text-green-600'}`}>
+                    {riskData.rating || 'N/A'}
+                </div>
             </div>
-            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-left space-y-2">
-                <p className="text-sm text-slate-600">
-                    <strong>Fleet:</strong> {riskData.company_name}
-                </p>
-                <p className="text-sm text-slate-600">
-                    <strong>Fleet Size:</strong> {riskData.fleet_size} Power Units
-                </p>
+
+            {/* Tile 2: Crash Count */}
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center">
+                <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Crashes (24mo)</div>
+                <div className={`text-lg md:text-xl font-black ${riskData.total_crashes > 0 ? 'text-red-600' : 'text-slate-900'}`}>
+                    {riskData.total_crashes}
+                </div>
             </div>
-            
-            <div className="mt-4 space-y-2 text-left">
-                <p className="text-sm text-slate-700">
-                    <span className="font-bold text-red-600">⚠️ Financial Exposure:</span> Your estimated liability is <strong>$160,000/year</strong> based on your fleet size and safety data.
-                </p>
-                <p className="text-sm text-slate-700">
-                    We have unlocked a <strong>Priority Review Slot</strong> to validate these findings.
-                </p>
+
+            {/* Tile 3: Driver OOS */}
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center">
+                <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Driver OOS</div>
+                <div className={`text-lg md:text-xl font-black ${riskData.driver_oos_rate > 5 ? 'text-orange-600' : 'text-slate-900'}`}>
+                    {riskData.driver_oos_rate}%
+                </div>
             </div>
         </div>
 
-        {/* THE GATE FORM */}
-        <form onSubmit={handleStage2Submit} className="space-y-3">
-            <h4 className="text-md font-bold text-slate-800 text-center">
-                Where should we send the Fix Report?
-            </h4>
-            
-            <input
-                name="full_name"
-                placeholder="Your Name"
-                required
-                value={formData.full_name || ''}
-                onChange={handleChange}
-                className="w-full p-3 border border-slate-300 rounded-lg text-slate-900"
-            />
-            <input
-                name="work_email"
-                type="email"
-                placeholder="Work Email (Required for Report)"
-                required
-                value={formData.work_email || ''}
-                onChange={handleChange}
-                className="w-full p-3 border border-slate-300 rounded-lg text-slate-900"
-            />
-            
-            <div className="grid grid-cols-2 gap-2">
-                <select 
-                    name="fleet_size" 
-                    value={formData.fleet_size || ''} 
-                    onChange={handleChange}
-                    className="w-full p-3 border border-slate-300 rounded-lg bg-white text-slate-900"
+        {/* 3. SPLIT-PATH COPY LOGIC */}
+        <div className={`${bgColor} p-6 rounded-lg border ${borderColor} mb-8 text-left`}>
+            {isHighRisk ? (
+                <>
+                    <h4 className="text-red-800 font-bold text-lg mb-2 flex items-center gap-2">
+                        <AlertTriangle className="h-5 w-5" />
+                        WARNING: CRITICAL LIABILITY EXPOSURE DETECTED
+                    </h4>
+                    <p className="text-red-700 text-sm leading-relaxed">
+                        Your <strong>{riskData.rating}</strong> rating and <strong>{riskData.driver_oos_rate}%</strong> Driver OOS rate confirm you are operating in a High-Risk status. 
+                        This exposure, coupled with your crash history, is costing you <strong>$25,000+ per incident</strong> in unmitigated insurance liability.
+                    </p>
+                </>
+            ) : (
+                <>
+                    <h4 className="text-blue-800 font-bold text-lg mb-2 flex items-center gap-2">
+                        <CheckCircle className="h-5 w-5" />
+                        OPPORTUNITY: HIDDEN PROFIT THEFT DETECTED
+                    </h4>
+                    <p className="text-blue-700 text-sm leading-relaxed">
+                        Congratulations on your Satisfactory rating. However, our scan indicates this clean record often hides massive internal leakage. 
+                        Your fleet scale suggests <strong>$160,000 – $320,000</strong> in annual recoverable waste driven by fuel theft and poor utilization.
+                    </p>
+                </>
+            )}
+        </div>
+
+        {/* 4. THE GATE (EMAIL CAPTURE) */}
+        <form onSubmit={handleStage2Submit} className="space-y-4">
+            <div>
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider ml-1">Enter Work Email to Unlock Report</label>
+                <input
+                    name="work_email"
+                    type="email"
+                    placeholder="name@company.com"
                     required
-                >
-                    <option value="" disabled>Fleet Size</option>
-                    <option value={FleetSize.SMALL}>10-20 Trucks</option>
-                    <option value={FleetSize.MEDIUM}>21-50 Trucks</option>
-                    <option value={FleetSize.LARGE}>51-100 Trucks</option>
-                    <option value={FleetSize.ENTERPRISE}>100+ Trucks</option>
-                </select>
-                
-                 <select 
-                    name="role" 
-                    value={formData.role || ''} 
+                    value={formData.work_email || ''}
                     onChange={handleChange}
-                    className="w-full p-3 border border-slate-300 rounded-lg bg-white text-slate-900"
-                    required
-                >
-                    <option value="" disabled>Role</option>
-                    <option value={Role.OWNER}>Owner</option>
-                    <option value={Role.MANAGER}>Manager</option>
-                    <option value={Role.FINANCE}>Finance</option>
-                    <option value={Role.OTHER}>Other</option>
-                </select>
+                    className="w-full p-4 border-2 border-slate-200 rounded-lg text-slate-900 focus:border-blue-600 focus:outline-none"
+                />
             </div>
 
             <button 
                 type="submit"
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg shadow-lg hover:shadow-xl transition-all flex justify-center items-center gap-2 mt-4"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg shadow-lg hover:shadow-xl transition-all flex justify-center items-center gap-2 text-lg"
             >
-                Unlock My Full Report <ArrowRight/>
+                Send My Confidential Liability Report <ArrowRight className="h-5 w-5" />
             </button>
+            
+            <p className="text-center text-xs text-slate-400 flex items-center justify-center gap-1">
+                <Lock className="h-3 w-3" /> Confidentiality Guaranteed: Your data is secured with 256-bit encryption. We are SOC 2 ready.
+            </p>
         </form>
       </div>
     );
