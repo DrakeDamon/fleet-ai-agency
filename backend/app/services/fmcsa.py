@@ -75,7 +75,8 @@ async def fetch_carrier_risk(dot_number: str):
                 "rating": rating,
                 "risk_level": risk_level,
                 "risk_flags": flags,
-                "total_crashes": total_crashes
+                "total_crashes": total_crashes,
+                "fleet_size": int(carrier.get("totalPowerUnits", 0))
             }
 
         except HTTPException as he:

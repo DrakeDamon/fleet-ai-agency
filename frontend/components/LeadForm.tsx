@@ -7,8 +7,8 @@ import { Loader2, AlertTriangle, CheckCircle, ArrowRight, ChevronLeft, X } from 
 import { InlineWidget } from "react-calendly";
 
 export default function LeadForm() {
-  // STATE MACHINE: 'input' -> 'analyzing' -> 'results' -> 'qualification' -> 'submitting' -> 'success'
-  const [step, setStep] = useState<'input' | 'analyzing' | 'results' | 'qualification' | 'submitting' | 'success'>('input');
+  // STATE MACHINE: 'input' -> 'analyzing' -> 'results' -> 'qualification' -> 'submitting' -> 'success' -> 'waitlist'
+  const [step, setStep] = useState<'input' | 'analyzing' | 'results' | 'qualification' | 'submitting' | 'success' | 'waitlist'>('input');
   
   // SINGLE SOURCE OF TRUTH
   const [formData, setFormData] = useState<Partial<LeadFormData>>({
@@ -45,7 +45,14 @@ export default function LeadForm() {
     if (data) {
       setRiskData(data);
       setFormData(prev => ({ ...prev, company_name: data.company_name })); // Auto-fill Name
-      setStep('results');
+      
+      // QUALIFICATION LOGIC
+      const fleetSize = data.fleet_size || 0;
+      if (fleetSize < 20) {
+          setStep('waitlist');
+      } else {
+          setStep('results');
+      }
     } else {
       // Fallback if DOT not found
       setStep('input'); 
@@ -128,62 +135,27 @@ export default function LeadForm() {
       <div className="bg-white p-8 rounded-xl shadow-2xl border-2 border-red-100">
         {/* TEASER RESULTS */}
         <div className="text-center mb-6">
-            {riskData.risk_level === 'LOW' ? (
-                // SAFE PATH
-                <>
-                    <div className="inline-flex items-center gap-2 text-green-600 font-bold text-xl mb-2">
-                        <CheckCircle className="h-6 w-6" />
-                        ✅ DOT Safety Status: STRONG
-                    </div>
-                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-left space-y-2">
-                        <p className="text-sm text-slate-600">
-                            <strong>Fleet:</strong> {riskData.company_name}
-                        </p>
-                        <p className="text-sm text-slate-600">
-                            <strong>Vehicle OOS:</strong> <span className="text-green-600 font-bold">{riskData.vehicle_oos_rate}%</span> 
-                            <span className="text-slate-400 text-xs ml-1">(National Avg: 22%)</span>
-                        </p>
-                    </div>
-                    
-                    <div className="mt-4 space-y-2 text-left">
-                        <p className="text-sm text-slate-700">
-                            <span className="font-bold text-green-600">✓ Great Work:</span> Your compliance score is beating the National Average.
-                        </p>
-                        <p className="text-sm text-slate-700">
-                            <span className="font-bold text-red-600">⚠️ The Blind Spot:</span> Public safety data does not track <strong>Fuel Fraud</strong> or <strong>Over-Maintenance</strong>.
-                        </p>
-                        <p className="text-sm text-slate-500 italic">
-                            &quot;Safe fleets your size typically lose $5,000/mo to internal financial leaks.&quot;
-                        </p>
-                    </div>
-                </>
-            ) : (
-                // RISK PATH
-                <>
-                    <div className="inline-flex items-center gap-2 text-red-600 font-bold text-xl mb-2">
-                        <AlertTriangle className="h-6 w-6" />
-                        🔴 HIGH RISK DETECTED
-                    </div>
-                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-left space-y-2">
-                        <p className="text-sm text-slate-600">
-                            <strong>Fleet:</strong> {riskData.company_name}
-                        </p>
-                        <p className="text-sm text-slate-600">
-                            <strong>Vehicle OOS:</strong> <span className="text-red-600 font-bold">{riskData.vehicle_oos_rate}%</span> 
-                            <span className="text-slate-400 text-xs ml-1">(National Avg: 22%)</span>
-                        </p>
-                    </div>
-                    
-                    <div className="mt-4 space-y-2 text-left">
-                        <p className="text-sm text-slate-700">
-                            <span className="font-bold text-red-600">⚠️ Bad:</span> This &apos;Conditional&apos; trend means you are likely <strong>overpaying on insurance</strong> and <strong>losing broker bids</strong> right now.
-                        </p>
-                        <p className="text-sm text-green-700">
-                            <span className="font-bold">✓ Good:</span> The specific data leaks causing this are visible to our AI. Enter your email to see the Fix Report immediately.
-                        </p>
-                    </div>
-                </>
-            )}
+            <div className="inline-flex items-center gap-2 text-green-600 font-bold text-xl mb-2">
+                <CheckCircle className="h-6 w-6" />
+                ✅ Enterprise Profile Detected
+            </div>
+            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-left space-y-2">
+                <p className="text-sm text-slate-600">
+                    <strong>Fleet:</strong> {riskData.company_name}
+                </p>
+                <p className="text-sm text-slate-600">
+                    <strong>Fleet Size:</strong> {riskData.fleet_size} Power Units
+                </p>
+            </div>
+            
+            <div className="mt-4 space-y-2 text-left">
+                <p className="text-sm text-slate-700">
+                    <span className="font-bold text-red-600">⚠️ Financial Exposure:</span> Your estimated liability is <strong>$160,000/year</strong> based on your fleet size and safety data.
+                </p>
+                <p className="text-sm text-slate-700">
+                    We have unlocked a <strong>Priority Review Slot</strong> to validate these findings.
+                </p>
+            </div>
         </div>
 
         {/* THE GATE FORM */}
@@ -460,6 +432,35 @@ export default function LeadForm() {
             </p>
         </div>
     );
+  }
+
+  // --- RENDER: WAITLIST (SMALL FLEETS) ---
+  if (step === 'waitlist') {
+      return (
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-8 text-center shadow-inner">
+            <div className="flex justify-center mb-4">
+                <div className="bg-slate-200 p-3 rounded-full">
+                    <CheckCircle className="h-8 w-8 text-slate-500" />
+                </div>
+            </div>
+            <h3 className="text-xl font-bold text-slate-800 mb-2">Application Received</h3>
+            <p className="text-slate-600 mb-6 text-sm leading-relaxed">
+                Your fleet size is currently below our threshold for the Enterprise Audit. 
+                We have added you to the waitlist for our Self-Serve Tool. 
+                <br/><br/>
+                <strong>Your basic report has been emailed.</strong>
+            </p>
+            <button 
+                onClick={() => {
+                    setStep('input');
+                    setFormData({ ...formData, dot_number: "" });
+                }}
+                className="text-slate-500 hover:text-slate-800 font-semibold text-sm underline"
+            >
+                Return Home
+            </button>
+        </div>
+      );
   }
 
   return null;

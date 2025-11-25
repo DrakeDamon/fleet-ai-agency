@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import LeadForm from "../components/LeadForm";
+import Hero from "../components/Hero";
 import { Check, TrendingUp, AlertTriangle, ShieldAlert } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -27,53 +28,7 @@ export default function Home() {
       />
 
       {/* HERO SECTION */}
-      <section className="relative bg-slate-900 text-white pt-20 pb-32 overflow-hidden">
-        <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
-          <div className="z-10">
-            <div className="inline-block bg-blue-600/20 text-blue-300 px-3 py-1 rounded-full text-sm font-semibold mb-6 border border-blue-500/30">
-              For Fleets with 20–100 Power Units
-            </div>
-            <h1 className="text-5xl font-bold leading-tight mb-6">
-              Stop Bleeding Profit to <span className="text-blue-400">Breakdowns</span> & <span className="text-orange-400">Fraud</span>.
-            </h1>
-            <p className="text-xl text-slate-300 mb-8 max-w-lg">
-              Most fleets are drowning in data but starving for insights. We use AI to audit your TMS & Telematics data and find your hidden cost-per-mile leaks.
-            </p>
-            
-            {/* Trust/Authority Elements */}
-            <div className="mb-8">
-              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-3">Trusted By Fleets Using</p>
-              <div className="flex flex-wrap gap-6 opacity-60 grayscale text-slate-400 font-bold text-lg items-center">
-                <span>Samsara</span>
-                <span>Motive</span>
-                <span>Geotab</span>
-                <span>Omnitracs</span>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3 text-slate-400">
-              <div className="flex items-center gap-2"><Check className="text-green-400" /> No new software to install</div>
-              <div className="flex items-center gap-2"><Check className="text-green-400" /> Identify top 3 leaks in under 48 hours</div>
-            </div>
-          </div>
-          
-          <div className="z-10">
-            <LeadForm />
-            {/* Testimonial */}
-            <div className="mt-6 bg-slate-800/50 p-4 rounded-lg border border-slate-700 backdrop-blur-sm">
-              <div className="flex gap-1 text-yellow-400 mb-2">
-                {"★★★★★"}
-              </div>
-              <p className="text-slate-300 text-sm italic">
-                &quot;We found $80K in fuel fraud within the first week of the audit. It paid for itself 10x over.&quot;
-              </p>
-              <p className="text-slate-500 text-xs mt-2 font-semibold">
-                — Mike T., Fleet Operations Director
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <Hero />
 
       {/* TRUST BAR */}
       <div className="bg-slate-100 border-b border-slate-200 py-6">
