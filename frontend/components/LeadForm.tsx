@@ -395,7 +395,7 @@ export default function LeadForm() {
                                 {/* VIDEO SLOT */}
                                 <div className="w-full aspect-video rounded-lg overflow-hidden shadow-lg mb-6 relative bg-slate-900 mt-auto">
                                     <iframe 
-                                        src="https://player.vimeo.com/video/1140156854?autoplay=1&title=0&byline=0&portrait=0" 
+                                        src="https://player.vimeo.com/video/1140918293?autoplay=1&title=0&byline=0&portrait=0" 
                                         className="absolute top-0 left-0 w-full h-full" 
                                         frameBorder="0" 
                                         allow="autoplay; fullscreen; picture-in-picture" 
