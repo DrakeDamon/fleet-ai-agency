@@ -18,7 +18,7 @@ export default function Header() {
             </div>
         </Link> */}
         
-        <div className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
+        <div className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600 ml-auto">
             <Link href="/" className="hover:text-slate-900 transition-colors">Home</Link>
             <Link href="/audit-process" className="hover:text-slate-900 transition-colors">Audit Process</Link>
             <Link href="/faq" className="hover:text-slate-900 transition-colors">FAQ</Link>
