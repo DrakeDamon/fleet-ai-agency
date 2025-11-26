@@ -48,6 +48,20 @@ export default function LeadForm() {
       
       // QUALIFICATION LOGIC
       const fleetSize = data.fleet_size || 0;
+      
+      // Auto-map Fleet Size to Enum for Validation
+      let mappedSize: FleetSize | undefined;
+      if (fleetSize >= 100) mappedSize = FleetSize.ENTERPRISE;
+      else if (fleetSize > 50) mappedSize = FleetSize.LARGE;
+      else if (fleetSize > 20) mappedSize = FleetSize.MEDIUM;
+      else mappedSize = FleetSize.SMALL; // Covers 20 and technically below, though below goes to waitlist
+
+      setFormData(prev => ({ 
+          ...prev, 
+          company_name: data.company_name,
+          fleet_size: mappedSize 
+      }));
+
       if (fleetSize < 20) {
           setStep('waitlist');
       } else {
@@ -219,6 +233,38 @@ export default function LeadForm() {
 
         {/* 4. THE GATE (EMAIL CAPTURE) */}
         <form onSubmit={handleStage2Submit} className="space-y-4">
+            {/* Full Name */}
+            <div>
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider ml-1">Full Name</label>
+                <input
+                    name="full_name"
+                    type="text"
+                    placeholder="John Doe"
+                    required
+                    value={formData.full_name || ''}
+                    onChange={handleChange}
+                    className="w-full p-4 border-2 border-slate-200 rounded-lg text-slate-900 focus:border-blue-600 focus:outline-none"
+                />
+            </div>
+
+            {/* Role Selection */}
+            <div>
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider ml-1">Role</label>
+                <select
+                    name="role"
+                    required
+                    value={formData.role || ''}
+                    onChange={handleChange}
+                    className="w-full p-4 border-2 border-slate-200 rounded-lg text-slate-900 focus:border-blue-600 focus:outline-none bg-white"
+                >
+                    <option value="" disabled>Select your role...</option>
+                    {Object.values(Role).map((r) => (
+                        <option key={r} value={r}>{r}</option>
+                    ))}
+                </select>
+            </div>
+
+            {/* Work Email */}
             <div>
                 <label className="text-xs font-bold text-slate-700 uppercase tracking-wider ml-1">Enter Work Email to Unlock Report</label>
                 <input
