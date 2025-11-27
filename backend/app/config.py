@@ -1,5 +1,8 @@
 from pydantic_settings import BaseSettings
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class Settings(BaseSettings):
     DATABASE_URL: str
@@ -16,7 +19,7 @@ class Settings(BaseSettings):
     PORT: int = int(os.getenv("PORT", 8000))
 
     class Config:
-        env_file = ".env"
+        # env_file = ".env"
         case_sensitive = False
         extra = "ignore"
 

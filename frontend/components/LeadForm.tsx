@@ -168,6 +168,9 @@ export default function LeadForm() {
       <div className={`bg-white p-8 rounded-xl shadow-2xl border-2 ${borderColor}`}>
         {/* 1. HERO HEADLINE */}
         <div className="text-center mb-8">
+            <div className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">
+                REPORT FOR: {riskData.company_name}
+            </div>
             <h3 className="text-2xl md:text-3xl font-bold text-slate-900 leading-tight">
                 CRITICAL FINDINGS: <br/>
                 <span className={isHighRisk ? "text-red-600" : "text-blue-600"}>
