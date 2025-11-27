@@ -67,7 +67,7 @@ async def fetch_carrier_risk(dot_number: str):
                 flags.append("Safety Rating is CONDITIONAL (Insurance Risk)")
 
             if total_crashes > 0:
-                flags.append(f"{total_crashes} Reportable Crashes (Potential Ghost Downtime)")
+                flags.append(f"{total_crashes} Recent Crashes (Potential Ghost Downtime)")
 
             return {
                 "company_name": carrier.get("legalName"),
@@ -77,7 +77,15 @@ async def fetch_carrier_risk(dot_number: str):
                 "risk_level": risk_level,
                 "risk_flags": flags,
                 "total_crashes": total_crashes,
-                "fleet_size": int(carrier.get("totalPowerUnits", 0))
+                "towaway_crashes": tow,
+                "fatal_crashes": fatal,
+                "injury_crashes": injury,
+                "fleet_size": int(carrier.get("totalPowerUnits", 0)),
+                "total_drivers": int(carrier.get("totalDrivers", 0)),
+                "allowed_to_operate": carrier.get("allowedToOperate", "N"),
+                # Aliases for PDF Service
+                "unit_count": int(carrier.get("totalPowerUnits", 0)),
+                "driver_count": int(carrier.get("totalDrivers", 0))
             }
 
         except HTTPException as he:

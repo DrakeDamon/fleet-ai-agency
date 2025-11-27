@@ -180,7 +180,7 @@ export default function LeadForm() {
         </div>
 
         {/* 2. DATA SCORECARD (VISUAL ANCHOR) */}
-        <div className="grid grid-cols-3 gap-2 md:gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-8">
             {/* Tile 1: Safety Rating */}
             <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center">
                 <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Safety Rating</div>
@@ -189,20 +189,29 @@ export default function LeadForm() {
                 </div>
             </div>
 
-            {/* Tile 2: Crash Count */}
+            {/* Tile 2: Vehicle OOS */}
             <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center">
-                <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Crashes (24mo)</div>
-                <div className={`text-lg md:text-xl font-black ${riskData.total_crashes > 0 ? 'text-red-600' : 'text-slate-900'}`}>
-                    {riskData.total_crashes}
+                <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Vehicle OOS</div>
+                <div className={`text-lg md:text-xl font-black ${riskData.vehicle_oos_rate > 20.72 ? 'text-red-600' : 'text-slate-900'}`}>
+                    {riskData.vehicle_oos_rate.toFixed(1)}%
+                    <span className="text-[10px] text-slate-400 block font-normal mt-1">(Natl: 20.7%)</span>
                 </div>
             </div>
 
             {/* Tile 3: Driver OOS */}
             <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center">
                 <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Driver OOS</div>
-                <div className={`text-lg md:text-xl font-black ${riskData.driver_oos_rate > 5 ? 'text-orange-600' : 'text-slate-900'}`}>
+                <div className={`text-lg md:text-xl font-black ${riskData.driver_oos_rate > 5.51 ? 'text-orange-600' : 'text-slate-900'}`}>
                     {riskData.driver_oos_rate.toFixed(1)}%
-                    <span className="text-xs text-slate-400 block font-normal mt-1">(Natl Avg: 3.81%)</span>
+                    <span className="text-[10px] text-slate-400 block font-normal mt-1">(Natl: 5.5%)</span>
+                </div>
+            </div>
+
+            {/* Tile 4: Crash Count */}
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center">
+                <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Crashes (24mo)</div>
+                <div className={`text-lg md:text-xl font-black ${riskData.total_crashes > 0 ? 'text-red-600' : 'text-slate-900'}`}>
+                    {riskData.total_crashes}
                 </div>
             </div>
         </div>

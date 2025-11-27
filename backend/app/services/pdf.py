@@ -7,225 +7,191 @@ from app.models import Lead
 
 def generate_risk_report(lead: Lead, fmcsa_data: dict) -> bytes:
     """
-    Generates a High-End PDF Risk Snapshot in memory.
+    Generates a 2-Page Executive Valuation Brief.
+    Page 1: Cover Sheet (Navy Blue Background)
+    Page 2: The Dashboard (Scorecard + Financial Narrative)
     """
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
     width, height = letter
 
-    # --- 1. BRANDED HEADER (Conditional) ---
+    # --- DATA PREP ---
     risk_level = fmcsa_data.get('risk_level', 'UNKNOWN')
-    
-    if risk_level == "LOW":
-        # SAFE PATH: Profit Optimization
-        c.setFillColorRGB(0.1, 0.15, 0.3) # Navy Blue
-        c.rect(0, height - 1.5*inch, width, 1.5*inch, fill=True, stroke=False)
-        
-        c.setFillColor(colors.white)
-        c.setFont("Helvetica-Bold", 24)
-        c.drawCentredString(width / 2, height - 0.9*inch, "PROFIT OPTIMIZATION SNAPSHOT")
-        c.setFont("Helvetica", 10)
-        c.drawCentredString(width / 2, height - 1.2*inch, "CONFIDENTIAL EFFICIENCY REPORT")
-    else:
-        # RISK PATH: Remediation
-        c.setFillColorRGB(0.1, 0.15, 0.3) # Navy Blue
-        c.rect(0, height - 1.5*inch, width, 1.5*inch, fill=True, stroke=False)
-        
-        c.setFillColor(colors.white)
-        c.setFont("Helvetica-Bold", 24)
-        c.drawCentredString(width / 2, height - 0.9*inch, "FLEET DATA RISK SNAPSHOT")
-        c.setFont("Helvetica", 10)
-        c.drawCentredString(width / 2, height - 1.2*inch, "CONFIDENTIAL DIAGNOSTIC REPORT")
-
-    # --- 2. CLIENT PROFILE BOX ---
-    y = height - 2.5*inch
-    c.setFillColor(colors.black)
-    c.setFont("Helvetica-Bold", 14)
-    c.drawString(0.5*inch, y, "1. FLEET PROFILE")
-    
-    y -= 20
-    c.setFont("Helvetica", 12)
-    # Handle potential None values gracefully
-    name = lead.full_name if hasattr(lead, 'full_name') else "Valued Client"
-    c.drawString(0.5*inch, y, f"Fleet: {lead.company_name}")
-    c.drawString(4.5*inch, y, f"DOT #: {lead.dot_number}")
-    
-    y -= 20
-    c.drawString(0.5*inch, y, f"Contact: {name}")
-    c.drawString(4.5*inch, y, f"Est. Size: {lead.fleet_size}")
-    
-    # Draw a line separator
-    c.setStrokeColor(colors.lightgrey)
-    c.line(0.5*inch, y - 15, width - 0.5*inch, y - 15)
-
-    # --- 3. RISK ANALYSIS (The Scorecard) ---
-    y -= 60
-    c.setFont("Helvetica-Bold", 14)
-    c.drawString(0.5*inch, y, "2. FMCSA RISK ANALYSIS")
-    
-    # Extract Data
+    unit_count = fmcsa_data.get('unit_count', 1)
+    driver_count = fmcsa_data.get('driver_count', 0)
     vehicle_oos = float(fmcsa_data.get('vehicle_oos_rate', 0))
-    natl_avg = 22.0
+    driver_oos = float(fmcsa_data.get('driver_oos_rate', 0))
+    total_crashes = fmcsa_data.get('total_crashes', 0)
     
-    # Visual Badge Logic
-    y -= 40
-    if risk_level in ["HIGH", "CRITICAL"]:
-        badge_color = colors.red
-        text_color = colors.white
-        badge_text = f"RISK LEVEL: {risk_level}"
-    elif risk_level == "MODERATE":
-        badge_color = colors.orange
-        text_color = colors.white
-        badge_text = f"RISK LEVEL: {risk_level}"
-    else:
-        badge_color = colors.green
-        text_color = colors.white
-        badge_text = "SAFETY STATUS: STRONG"
-        
-    # Draw Badge
-    c.setFillColor(badge_color)
-    c.roundRect(0.5*inch, y - 10, 200, 30, 4, fill=True, stroke=False)
-    c.setFillColor(text_color)
-    c.setFont("Helvetica-Bold", 12)
-    c.drawCentredString(0.5*inch + 100, y, badge_text)
+    # Calculations
+    # Bleed: Units * $6,000 (Fuel) * 5% (Fraud)
+    monthly_bleed = unit_count * 6000 * 0.05
     
-    # --- 4. DATA VISUALIZATION (Conditional) ---
-    if risk_level == "LOW":
-        # SAFE PATH: Show "Checkmark" / Positive Reinforcement
-        c.setFillColor(colors.black)
-        c.setFont("Helvetica", 10)
-        c.drawString(4.5*inch, y + 20, "Compliance Status")
-        
-        c.setFillColor(colors.green)
-        c.setFont("Helvetica-Bold", 14)
-        c.drawString(4.5*inch, y, "✓ BEATING NATIONAL AVERAGE")
-        c.setFont("Helvetica", 10)
-        c.setFillColor(colors.black)
-        c.drawString(4.5*inch, y - 15, f"Your OOS: {vehicle_oos}% (Natl Avg: {natl_avg}%)")
-        
-    else:
-        # RISK PATH: The Bar Chart
-        c.setFillColor(colors.black)
-        c.setFont("Helvetica", 10)
-        c.drawString(4.5*inch, y + 20, "Vehicle Out-of-Service Rate")
-        
-        chart_base_y = y - 10
-        # National Bar (Grey)
-        c.setFillColor(colors.lightgrey)
-        c.rect(4.5*inch, chart_base_y, 150 * (natl_avg/100), 15, fill=True, stroke=False)
-        c.setFillColor(colors.black)
-        c.drawString(4.5*inch + 5, chart_base_y + 4, f"Natl Avg: {natl_avg}%")
-        
-        # Client Bar (Red if high)
-        client_color = colors.red if vehicle_oos > natl_avg else colors.green
-        c.setFillColor(client_color)
-        c.rect(4.5*inch, chart_base_y - 20, 150 * (vehicle_oos/100), 15, fill=True, stroke=False)
-        c.setFillColor(colors.white)
-        c.drawString(4.5*inch + 5, chart_base_y - 16, f"Your Fleet: {vehicle_oos}%")
+    # Churn: Drivers / Units
+    churn_ratio = driver_count / unit_count if unit_count > 0 else 0
+    
+    # ==========================================
+    # PAGE 1: COVER SHEET
+    # ==========================================
+    
+    # Full Navy Blue Background
+    c.setFillColorRGB(0.06, 0.09, 0.16) # #0F172A (Navy Blue)
+    c.rect(0, 0, width, height, fill=True, stroke=False)
+    
+    # Centered Content
+    c.setFillColor(colors.white)
+    
+    # Logo Placeholder (Text for now)
+    c.setFont("Helvetica-Bold", 30)
+    c.drawCentredString(width / 2, height - 3*inch, "FLEET AI AGENCY")
+    
+    # Report Title
+    c.setFont("Helvetica-Bold", 24)
+    c.drawCentredString(width / 2, height / 2 + 20, "CONFIDENTIAL")
+    c.drawCentredString(width / 2, height / 2 - 20, "VALUATION DEFENSE REPORT")
+    
+    # Client Details
+    c.setFont("Helvetica", 16)
+    y = height / 2 - 1.5*inch
+    c.drawCentredString(width / 2, y, f"Prepared For: {lead.company_name}")
+    c.drawCentredString(width / 2, y - 30, f"DOT #: {lead.dot_number}")
+    
+    c.showPage()
 
-    # --- 5. FINANCIAL IMPACT (The Pain) ---
-    y -= 80
-    c.setFillColor(colors.black)
-    c.setFont("Helvetica-Bold", 14)
-    
-    if risk_level == "LOW":
-        c.drawString(0.5*inch, y, "3. HIDDEN PROFIT LEAKS")
-    else:
-        c.drawString(0.5*inch, y, "3. PROJECTED FINANCIAL BLEED")
-    
-    # Dynamic Math
-    # Estimate 100 gallons per truck per week * $3.50/gal * 4 weeks
-    # 5% Fraud/Waste Rate
-    truck_count_map = {"10-20": 15, "21-50": 35, "51-100": 75, "100+": 120}
-    # Handle case where fleet_size might be enum or string
-    est_trucks = truck_count_map.get(str(lead.fleet_size), 20)
-    monthly_fuel_spend = est_trucks * 400 * 3.50 
-    est_fraud_loss = monthly_fuel_spend * 0.05 # 5% Loss
-    
-    # Draw "Alert Box"
-    y -= 60
-    c.setFillColor(colors.lightyellow)
-    c.setStrokeColor(colors.orange)
-    c.rect(0.5*inch, y - 40, width - 1*inch, 80, fill=True, stroke=True)
-    
-    c.setFillColor(colors.red)
-    c.setFont("Helvetica-Bold", 12)
-    
-    if risk_level == "LOW":
-        c.drawString(0.7*inch, y + 20, "⚠ UNVERIFIED SPEND DETECTED")
-    else:
-        c.drawString(0.7*inch, y + 20, "⚠ CRITICAL PROFIT LEAKS DETECTED")
-    
-    c.setFillColor(colors.black)
-    c.setFont("Helvetica", 11)
-    
-    if risk_level == "LOW":
-        # SAFE PATH: Fuel & Maintenance
-        c.drawString(0.7*inch, y, f"• Est. Unverified Fuel Spend: ${est_fraud_loss:,.0f} / Month (5% Industry Avg)")
-        y -= 20
-        c.drawString(0.7*inch, y, "• Est. Maintenance Over-Spend: 12% (Due to early replacement cycles)")
-    else:
-        # RISK PATH: Insurance & Fuel
-        if risk_level in ["HIGH", "CRITICAL"]:
-            c.drawString(0.7*inch, y, f"• Est. Insurance Premium Surcharge: $25,000+ / Year (Due to {risk_level} rating)")
-        else:
-            c.drawString(0.7*inch, y, f"• Est. Compliance Risk: Moderate (Audit probability increasing)")
-            
-        y -= 20
-        c.drawString(0.7*inch, y, f"• Est. Unverified Fuel Spend (Fraud/Waste): ${est_fraud_loss:,.0f} / Month")
-    
-    # --- 6. DECISION MAKER BLOCK (The "Trojan Horse" CTA) ---
-    y -= 100
-    
-    # Draw the Decision Maker Box
-    c.setFillColor(colors.HexColor("#F3F4F6"))  # Light Grey
-    c.setStrokeColor(colors.darkgrey)
-    c.rect(0.5*inch, y - 80, width - 1*inch, 100, fill=True, stroke=True)
+    # ==========================================
+    # PAGE 2: THE DASHBOARD
+    # ==========================================
     
     # Header
+    c.setFillColorRGB(0.06, 0.09, 0.16) # Navy Blue Header
+    c.rect(0, height - 1*inch, width, 1*inch, fill=True, stroke=False)
+    c.setFillColor(colors.white)
+    c.setFont("Helvetica-Bold", 18)
+    c.drawString(0.5*inch, height - 0.65*inch, "EXECUTIVE VALUATION BRIEF")
+    
+    # Layout Config
+    left_col_x = 0.5*inch
+    right_col_x = 3.0*inch # Start of right column (approx 1/3 split)
+    y_start = height - 1.5*inch
+    
+    # --- LEFT COLUMN: SCORECARD (1/3) ---
+    y = y_start
     c.setFillColor(colors.black)
     c.setFont("Helvetica-Bold", 14)
+    c.drawString(left_col_x, y, "FLEET SCORECARD")
+    y -= 20
     
-    if risk_level == "LOW":
-        c.drawCentredString(width/2, y - 10, "FINAL ACTION: STOP THE SILENT BLEED")
-    else:
-        c.drawCentredString(width/2, y - 10, "FINAL ACTION REQUIRED: SECURE YOUR PROFIT PROTECTION")
+    # Safety Rating Badge
+    status_color = colors.red if risk_level in ["HIGH", "CRITICAL"] else colors.green
+    status_text = "CONDITIONAL" if risk_level in ["HIGH", "CRITICAL"] else "SATISFACTORY"
     
-    # Body Text
+    c.setFillColor(status_color)
+    c.roundRect(left_col_x, y - 30, 150, 30, 4, fill=True, stroke=False)
+    c.setFillColor(colors.white)
+    c.setFont("Helvetica-Bold", 12)
+    c.drawCentredString(left_col_x + 75, y - 20, status_text)
+    
+    y -= 50
+    c.setFillColor(colors.black)
     c.setFont("Helvetica", 10)
-    y -= 35
+    c.drawString(left_col_x, y, "Safety Rating Status")
     
-    if risk_level == "LOW":
-        body_text = "To The Owner: Your safety is strong, but your efficiency is unverified."
-        c.drawCentredString(width/2, y, body_text)
-        y -= 15
-        c.drawCentredString(width/2, y, "Unlock your Profit Audit to recover these lost dollars.")
-    else:
-        body_text = "To The Owner: This report identifies potential savings that trigger our $20,000 Performance Guarantee."
-        c.drawCentredString(width/2, y, body_text)
-        y -= 15
-        c.drawCentredString(width/2, y, "We found the leaks. Do not delegate this fix.")
-    
-    # CTA Button/Link
-    y -= 30
-    c.setFillColor(colors.blue)
-    c.setFont("Helvetica-Bold", 11)
-    
-    if risk_level == "LOW":
-         c.drawCentredString(width/2, y, "CLICK HERE: Unlock Your Profit Audit")
-    else:
-        c.drawCentredString(width/2, y, "CLICK HERE: Book Your Guaranteed Profit Briefing")
-        
+    # OOS Metrics
+    y -= 40
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(left_col_x, y, f"Vehicle OOS: {vehicle_oos}%")
     c.setFont("Helvetica", 9)
-    c.setFillColor(colors.darkblue)
-    y -= 12
-    c.drawCentredString(width/2, y, "https://fleet-ai-agency.com/booking")
+    c.drawString(left_col_x, y - 12, "(Natl Avg: 20.7%)")
     
-    # --- 7. COPYRIGHT FOOTER ---
-    c.setFillColor(colors.grey)
+    y -= 40
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(left_col_x, y, f"Driver OOS: {driver_oos}%")
+    c.setFont("Helvetica", 9)
+    c.drawString(left_col_x, y - 12, "(Natl Avg: 5.5%)")
+    
+    y -= 40
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(left_col_x, y, f"Crashes: {total_crashes}")
+    c.setFont("Helvetica", 9)
+    c.drawString(left_col_x, y - 12, "(Last 24 Months)")
+
+    # --- RIGHT COLUMN: FINANCIAL NARRATIVE (2/3) ---
+    y = y_start
+    
+    # 1. Financial Bleed (The Anchor)
+    c.setFillColor(colors.black)
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(right_col_x, y, "FINANCIAL EXPOSURE ANALYSIS")
+    y -= 30
+    
+    # Bleed Box
+    c.setFillColor(colors.HexColor("#FEF2F2")) # Light Red
+    c.setStrokeColor(colors.red)
+    c.rect(right_col_x, y - 50, 350, 60, fill=True, stroke=True)
+    
+    c.setFillColor(colors.red)
+    c.setFont("Helvetica-Bold", 16)
+    c.drawCentredString(right_col_x + 175, y - 25, f"Est. Monthly Revenue Leakage: ${monthly_bleed:,.0f}")
+    c.setFont("Helvetica", 10)
+    c.setFillColor(colors.black)
+    c.drawCentredString(right_col_x + 175, y - 42, "Based on unverified fuel & maintenance transaction models")
+    
+    y -= 80
+    
+    # 2. Driver Churn Risk
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(right_col_x, y, "Operational Risk Assessment:")
+    y -= 20
+    
+    c.setFont("Helvetica", 11)
+    if churn_ratio > 1.5:
+        risk_text = "• High Theft Risk (Slip-Seating): Driver/Unit ratio > 1.5 indicates low accountability."
+        c.setFillColor(colors.red)
+    elif churn_ratio < 1.0:
+        risk_text = "• Utilization Risk (Idle Assets): Trucks are sitting without drivers generating revenue."
+        c.setFillColor(colors.orange)
+    else:
+        risk_text = "• Utilization: Healthy Driver/Unit ratio."
+        c.setFillColor(colors.green)
+        
+    c.drawString(right_col_x, y, risk_text)
+    
+    # 3. Liability Gap
+    y -= 40
+    c.setFillColor(colors.black)
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(right_col_x, y, "Liability Gap Assessment:")
+    y -= 20
+    
+    # Visual Bar
+    c.setFillColor(colors.lightgrey)
+    c.rect(right_col_x, y - 15, 300, 15, fill=True, stroke=False) # Benchmark Bar
+    c.setFillColor(colors.black)
+    c.setFont("Helvetica", 9)
+    c.drawString(right_col_x + 305, y - 10, "$27.5M (Avg Nuclear Verdict)")
+    
+    # Client Coverage (Assume $1M for visual if unknown, or use placeholder)
+    c.setFillColor(colors.blue)
+    c.rect(right_col_x, y - 15, 300 * (1/27.5), 15, fill=True, stroke=False) # Tiny bar for $1M
+    c.drawString(right_col_x, y - 25, "Your Coverage ($1M Est)")
+    
+    # Footer: Decision Maker Box
+    footer_y = 1.5*inch
+    c.setFillColor(colors.HexColor("#F3F4F6"))
+    c.setStrokeColor(colors.darkgrey)
+    c.rect(0.5*inch, footer_y, width - 1*inch, 0.8*inch, fill=True, stroke=True)
+    
+    c.setFillColor(colors.black)
+    c.setFont("Helvetica-Bold", 11)
+    c.drawCentredString(width/2, footer_y + 0.5*inch, "PERFORMANCE GUARANTEE")
+    c.setFont("Helvetica", 10)
+    c.drawCentredString(width/2, footer_y + 0.25*inch, "We will identify $20,000 in recoverable savings or refund the audit fee. (Valid for fleets with 20+ units).")
+    
+    # Metadata Footer
     c.setFont("Helvetica", 8)
-    c.drawCentredString(width/2, 40, "© 2024 Fleet AI Agency. Confidential & Proprietary.")
-    
+    c.setFillColor(colors.grey)
+    c.drawCentredString(width/2, 0.5*inch, "© 2024 Fleet AI Agency | Operation Type: Interstate | Confidential")
+
     c.showPage()
     c.save()
     
