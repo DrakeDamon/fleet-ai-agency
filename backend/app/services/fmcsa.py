@@ -17,7 +17,8 @@ async def fetch_carrier_risk(dot_number: str):
             # Official QCMobile Endpoint
             response = await client.get(
                 f"{FMCSA_BASE_URL}/carriers/{dot_number}",
-                params={"webKey": webkey}
+                params={"webKey": webkey},
+                timeout=30.0
             )
             
             if response.status_code != 200:
